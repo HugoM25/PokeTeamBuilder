@@ -1,1 +1,4 @@
-<p>poke-display works!</p>
+<div *ngif="pokeInfos as poke">
+    <h2>{{ poke.name }}</h2>
+    <img [src]="poke.imageUrl" alt="poke image">
+</div>
