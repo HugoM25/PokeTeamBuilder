@@ -1,0 +1,10 @@
+.poke-container {
+    display: flex;
+    justify-content: center;
+    width: 80%;
+    //Center the container
+    margin: 0 auto;
+}
+.poke-item {
+    flex-direction: row;
+}

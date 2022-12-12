@@ -1,4 +1,7 @@
-<div>
-    <h2>{{ pokeInfos.name }}</h2>
-    <img [src]="pokeInfos.imageUrl" alt="poke image">
+<div class="poke-disp-card" *ngIf="pokeInfos">
+    <img src="assets/images/pokeball.png" class="pokeball-img" alt="pokeball">
+    <img [src]="pokeInfos.imageUrl" class="poke-img" alt="poke image">
+    <button class="lock-button">
+        <img class="lock-icon" src="assets/images/lock_icon_open.png" alt="lock icon">
+    </button>
 </div>
