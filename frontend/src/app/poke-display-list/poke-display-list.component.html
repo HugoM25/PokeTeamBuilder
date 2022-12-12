@@ -1,3 +1,3 @@
 <div class="poke-container">
-    <app-poke-display *ngFor="let pokeInfos of pokeInfosList" [pokeInfos]="pokeInfos" class="poke-item"></app-poke-display> 
+    <app-poke-display *ngFor="let pokeInfos of pokeInfosList$ | async" [pokeInfos]="pokeInfos" (pokeNameChange)="changePoke($event)" class="poke-item"></app-poke-display> 
 </div>

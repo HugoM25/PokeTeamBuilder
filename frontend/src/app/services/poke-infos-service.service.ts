@@ -1,24 +1,30 @@
 import { Injectable } from '@angular/core';
 import { pokeInfos } from '../models/poke-infos.model';
-
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
 export class PokeInfosServiceService {
 
-  constructor() { }
+  constructor(private http:HttpClient) { }
 
-  pokelist : pokeInfos[] = [
-    {id: 1, name: 'Bulbasaur', imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png'},
-    {id: 2, name: 'Charmander', imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png'},
-    {id: 3, name: 'Squirtle', imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png'},
-    {id: 4, name: 'Lapras', imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/131.png'},
-    {id: 5, name: 'Gengar', imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png'},
-    {id: 6, name: 'Pikachu', imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png'}
-  ];
+  pokeNames : string[] = [
+    'Bulbasaur',
+    'Charmander',
+    'Squirtle',
+    'Lapras',
+    'Gengar',
+    'Pikachu'
+  ]
 
-  getPokeInfosList() {
-    return this.pokelist;
+  //Get the list of pokeInfos from the backend
+  getPokeInfosList() : Observable<pokeInfos[]> {
+    return this.http.get<pokeInfos[]>('http://127.0.0.1:5000');
+  }
+
+  getPokeNames():string[] {
+    return this.pokeNames;
   }
 
 

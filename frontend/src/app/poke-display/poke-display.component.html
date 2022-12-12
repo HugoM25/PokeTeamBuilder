@@ -1,7 +1,12 @@
 <div class="poke-disp-card" *ngIf="pokeInfos">
     <img src="assets/images/pokeball.png" class="pokeball-img" alt="pokeball">
-    <img [src]="pokeInfos.imageUrl" class="poke-img" alt="poke image">
-    <button class="lock-button">
-        <img class="lock-icon" src="assets/images/lock_icon_open.png" alt="lock icon">
+    <span class="resizable">
+        <img [src]="pokeInfos.imageUrl" class="poke-img" alt="poke image">
+    </span>
+    <button (click)="lockPoke()" class="lock-button">
+        <img class="lock-icon" src="{{imageLock}}" alt="lock icon">
     </button>
+    <select class="select-pkm-name"  (change)="setPoke($event)">
+        <option *ngFor="let pokeName of pokeNamesList" [value]="pokeName">{{pokeName}}</option>
+    </select>
 </div>
