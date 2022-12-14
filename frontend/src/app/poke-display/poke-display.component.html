@@ -6,7 +6,7 @@
     <button (click)="lockPoke()" class="lock-button">
         <img class="lock-icon" src="{{imageLock}}" alt="lock icon">
     </button>
-    <select class="select-pkm-name"  (change)="setPoke($event)">
-        <option *ngFor="let pokeName of pokeNamesList" [value]="pokeName">{{pokeName}}</option>
+    <select class="select-pkm-name"  (change)="setPoke($event)" [value]="pokeInfos.name">
+        <option *ngFor="let pokeName of pokeNamesList" [value]="pokeName" [selected]="pokeName == pokeInfos.name">{{pokeName}}</option>
     </select>
 </div>
