@@ -2,7 +2,7 @@ import { Component} from '@angular/core';
 import { pokeInfos } from '../models/poke-infos.model';
 import { PokeInfosServiceService } from '../services/poke-infos-service.service';
 import { Input, OnInit, Output, EventEmitter} from '@angular/core';
-
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-poke-display',
@@ -17,20 +17,24 @@ export class PokeDisplayComponent implements OnInit {
   //Index of position in team list
   @Input() index!: number;
 
-  //Used to send data to the parent component
-  @Output() pokeNameChange : EventEmitter<string> = new EventEmitter<string>();
+  //Pkm names available choices
+  @Input() pokeNamesList!: string[];
 
-  //Contains the choices for the user in the dropdown menu
-  pokeNamesList: string[] = [];
+  //Used to send data to the parent component
+  @Output() pokeNameChange = new EventEmitter<{name:string,index:number}>();
+
 
   //Handling the lock button
   locked: boolean = false;
   imageLock : string = "assets/images/lock_icon_open.png";
 
+  //Handling the dropdown menu
+
   constructor(private pokeInfosService: PokeInfosServiceService) {  }
 
   ngOnInit(){
-    this.pokeNamesList = this.pokeInfosService.getPokeNames();
+    console.log(this.index); 
+
   }
 
   //Lock/Unlock the pokemon
@@ -53,6 +57,9 @@ export class PokeDisplayComponent implements OnInit {
 
   //Change the pokemon in the parent component
   setPokeParentComponent(){
-    this.pokeNameChange.emit(this.pokeInfos.name);
+    this.pokeNameChange.emit({
+      name: this.pokeInfos.name,
+      index : this.index
+    });
   }
 }
