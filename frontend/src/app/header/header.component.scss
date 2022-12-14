@@ -1,6 +1,7 @@
 
+/*
 .div-header {
-    //Header with drop shadow
+    Header with drop shadow
     background-color: #f2f2f2;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
     height: 100%;
@@ -8,13 +9,30 @@
     padding-top: 2%;
     padding-bottom: 1%;
     margin-bottom: 5%;
+}*/
+
+.div-header {
+    /*Border */
+    border: solid;
+    border-color: #383838;
+    border-radius: 16px;
+
+    /*Backgroud*/
+    background-image: linear-gradient(to bottom, #e93232 90%, #383838 90% 95%, #ffffff 95% 100%);
+
+    /*Center*/
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+
+    /*Size*/
+    padding: 1%;
+    margin-bottom: 5%;
+
 }
 
 .title-text {
     font-size: 2.5em;
-    margin: 0;
-    padding: 0;
     text-align: center;
-    color: #383838;
-    margin-bottom: 3%;
+    color: #ffffff;
 }

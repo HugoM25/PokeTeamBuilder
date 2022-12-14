@@ -7,13 +7,15 @@ import { PokeDisplayComponent } from './poke-display/poke-display.component';
 import { PokeDisplayListComponent } from './poke-display-list/poke-display-list.component';
 import { HttpClientModule } from '@angular/common/http';
 import { HeaderComponent } from './header/header.component';
+import { CommandsElementsComponent } from './commands-elements/commands-elements.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     PokeDisplayComponent,
     PokeDisplayListComponent,
-    HeaderComponent
+    HeaderComponent,
+    CommandsElementsComponent
   ],
   imports: [
     BrowserModule,
