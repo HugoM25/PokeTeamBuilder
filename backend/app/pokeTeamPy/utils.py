@@ -1,4 +1,3 @@
-
 def load_json(file_path: str) -> dict:
     """
     Loads a json file and returns it as a dict
@@ -9,14 +8,16 @@ def load_json(file_path: str) -> dict:
     return data
 
 
+
 def get_pokemon_names_in_format(format_name: str) -> list:
     """
     Returns a list of all pokemon names in a given format
     """
     data = load_json("backend/app/pokeTeamPy/static/Json/gen8ou-0.json")
     print(data)
-    pkm_names = []
+    pkm_names = list(data['data'].keys())
     return pkm_names
+
 
 def is_pkm_in_format(pkm_name: str, format_name: str) -> bool:
     """

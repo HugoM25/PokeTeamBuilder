@@ -7,6 +7,8 @@ CORS(app)
 
 @app.route('/', methods=['GET'])
 def test():
+    '''Test route'''
+    print(pokeTeamPy.get_pokemon_names_in_format("/backend/app/static/Json/gen8ou-0.json"))
     pokeList = [
     ] 
     response = jsonify(pokeList)
@@ -15,6 +17,7 @@ def test():
 
 @app.route('/set_pkm', methods=["POST"])
 def set_pkm():
+    '''Get pokemon set'''
     if request.method == "POST" :
         #Get the data from the request
         json_data = request.get_json()
