@@ -19,20 +19,23 @@
 
 .poke-img {
     position: absolute;
-    top: 0;
+    //Center image over pokeball using margin
+    //Center vertically too 
+    margin: auto;
+    top: -15%;
     left: 0;
     right: 0;
     bottom: 0;
-    margin: auto;
+
+
     z-index: 1;
 
-    width: 100%;
+    width: 80%;
     height: auto;
     transition: transform 1s;
 }
 
 .resizable {
-    transition: transform 1s;
     :hover {
         transform: scale(1.1);
         transition: transform 0.5s;

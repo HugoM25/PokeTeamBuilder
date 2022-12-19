@@ -27,6 +27,8 @@ export class PokeDisplayListComponent implements OnInit{
   ngOnInit(): void {
     this.pokeInfosService.getPokeInfosList().pipe(take(1)).subscribe((data:pokeInfos[]) => {
       this.pokeInfosList = data;
+      console.log(this.pokeInfosList);
+
     });
     this.setNames();
   }
@@ -45,4 +47,5 @@ export class PokeDisplayListComponent implements OnInit{
       this.pokeNamesList = data;
     });
   }
+  
 }

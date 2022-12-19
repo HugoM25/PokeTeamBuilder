@@ -33,7 +33,10 @@ export class PokeInfosServiceService {
   }
 
   getPokeNames():Observable<string[]> {
-    return this.http.get<string[]>('http://127.0.0.1:5000/pkm_list');
+    const body = { tier : "GEN8OU" };
+    const req = this.http.post<string[]>('http://127.0.0.1:5000/get_pkm_in_tier', body);
+    req.subscribe();
+    return req;
   }
 
 
