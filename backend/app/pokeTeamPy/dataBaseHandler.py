@@ -92,15 +92,18 @@ class DataBaseHandler:
                     session.execute_write(link_mates_pkms, pkm_key.lower(), mate_key.lower(), tier_data[pkm_key]["Teammates"][mate_key], tier_name)
 
     
-    def find_pkm_linked_to(pkm_name, tier_name) :
+    def find_pkms_linked_to(self, pkm_name, tier_name, nb_pkms=10):
         '''
-        Find the pokemon linked to the given pokemon
+        Find the pokemons linked to the given pokemon
         param pkm_name: name of the pokemon
         param tier_name: name of the tier
+        param nb_pkms: number of pokemons to return
         '''
+        #get nb_pkms pokemons linked to the given pokemon and prints them
         with self.driver.session(database="pokedb") as session :
-            return session.run("MATCH (p1:Pokemon {name: $pkm_name})-[r:LINK]->(p2:Pokemon) WHERE r.tier = $tier_name RETURN p2.name, r.score", pkm_name=pkm_name, tier_name=tier_name)
-
+            result = session.run("MATCH (p1:Pokemon)-[r:LINK]->(p2:Pokemon) WHERE p1.name=$pkm_name AND r.name=$tier_name RETURN p2 ORDER BY r.value DESC LIMIT $nb_pkms", pkm_name=pkm_name, tier_name=tier_name, nb_pkms=nb_pkms)
+            for record in result:
+                print(record["p2"]["name"])
 #Static functions for the database -----------------------------------
 
 def create_pokemon(tx, name, num, stats, heightm, weightkg):
@@ -211,12 +214,13 @@ def update_db():
         db_handler.add_tier_data(tier_data=tier_data, tier_name=tier)
 
 
+
 if __name__ == "__main__" :
     '''
     When the script is run, the database is updated with the data from the tiers tracked
     '''
     #update_db()
-    pass 
+    
 
 
     
