@@ -2,44 +2,63 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import pokeTeamPy
 
+
 app = Flask(__name__)
 CORS(app)
 
 @app.route('/', methods=['GET'])
 def test():
-    '''Test route'''
-    print(pokeTeamPy.get_pokemon_names_in_format("/backend/app/static/Json/gen8ou-0.json"))
-    pokeList = [
-    ] 
-    response = jsonify(pokeList)
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    return response
+    response = None
+    if request.method == "GET":
+        team_builder = pokeTeamPy.TeamBuilder()
+        response = jsonify(team_builder.get_team())
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response, 200
 
-@app.route('/set_pkm', methods=["POST"])
-def set_pkm():
-    '''Get pokemon set'''
-    if request.method == "POST" :
+@app.route('/get_pkm_in_tier', methods=["POST"])
+def get_pkm_in_tier():
+    '''
+    Get all pokemon in a given tier
+    '''
+    response = None
+    if request.method == "POST":
         #Get the data from the request
         json_data = request.get_json()
-        #Create a pokemon response
-        pokeInfos = {
-            "name": json_data["name"].lower(),
-            "imageUrl": "https://play.pokemonshowdown.com/sprites/dex/" + json_data["name"].lower() + ".png"
-        }
-        #Return the response
-        response = jsonify(pokeInfos)
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        return response
 
-@app.route('/pkm_list', methods=["GET"])
-def pkm_list():
-    response = None
-    if request.method == "GET" :
-        pokeTeamPy
-        response = jsonify(nameList)
-        print(response)
+        #Get the pokemon in the given tier
+        pkm_names = db_handler.get_pokemons_in_tier(str(json_data["tier"]))
+
+        #Create the response
+        response = jsonify(pkm_names)
         response.headers.add("Access-Control-Allow-Origin", "*")
-    return response
+        return response, 200
+
+@app.route('/complete_team', methods=["POST"])
+def complete_team():
+    '''
+    Complete a team with pokemon from the given format
+    '''
+    response = None
+    if request.method == "POST":
+        #Get the data from the request
+        json_data = request.get_json()
+
+        #Create a team builder
+        team_builder = pokeTeamPy.TeamBuilder()
+
+        #Complete team 
+        team_builder.complete_team(json_data["format"], json_data["team"])
+
+        #Get the team
+        team = team_builder.get_team()
+
+        response = jsonify(team)
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response, 201
+
+
+
 
 if __name__ == '__main__':
+    db_handler = pokeTeamPy.DataBaseHandler()
     app.run(debug=True)
