@@ -1,0 +1,20 @@
+{
+    "tiersTracked": {
+        "GEN8OU": {
+            "name" : "[Gen8] OU",
+            "fileNameShowdown": "gen8ou-0.json"
+        },
+        "GEN8UU": {
+            "name" : "[Gen8] UU",
+            "fileNameShowdown": "gen8uu-0.json"
+        },
+        "GEN8RU": {
+            "name" : "[Gen8] RU",
+            "fileNameShowdown": "gen8ru-0.json"
+        },
+        "GEN8BDSPOU": {
+            "name" : "[BDSP] OU",
+            "fileNameShowdown": "gen8bdspou-0.json"
+        }
+    }
+}
