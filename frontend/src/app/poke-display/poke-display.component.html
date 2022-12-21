@@ -3,7 +3,7 @@
     <span class="resizable">
         <img [src]="pokeInfos.imageUrl" class="poke-img" alt="poke image">
     </span>
-    <button (click)="lockPoke()" class="lock-button">
+    <button (click)="updateLock()" class="lock-button">
         <img class="lock-icon" src="{{imageLock}}" alt="lock icon">
     </button>
     <select class="select-pkm-name"  (change)="setPoke($event)" [value]="pokeInfos.name">

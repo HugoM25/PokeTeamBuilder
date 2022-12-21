@@ -4,6 +4,8 @@ import { PokeInfosServiceService } from '../services/poke-infos-service.service'
 import { OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { take, map } from 'rxjs/operators';
+import { SharedServiceService } from '../services/shared-service.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-poke-display-list',
@@ -20,7 +22,13 @@ export class PokeDisplayListComponent implements OnInit{
 
   public pokeNamesList!: string[]
 
-  constructor(private pokeInfosService: PokeInfosServiceService) { }
+  clickEventsubscription:Subscription;
+
+  constructor(private pokeInfosService: PokeInfosServiceService, private sharedService:SharedServiceService) { 
+    this.clickEventsubscription=    this.sharedService.getClickEvent().subscribe(()=>{
+      this.generateTeam();
+    });
+  }
 
   //TO DO : check for memory leaks
   
@@ -42,10 +50,31 @@ export class PokeDisplayListComponent implements OnInit{
       this.pokeInfosList[object.index] = data;
     });
   }
+
+  //Lock/Unlock the pokemon at index
+  changeLock(object: {locked:boolean,index:number}){
+    if (this.pokeInfosList[object.index].isLocked){
+      this.pokeInfosList[object.index].isLocked = false;
+    }
+    else {
+      this.pokeInfosList[object.index].isLocked = true;
+    }
+  }
+
+
   setNames(){
     this.pokeInfosService.getPokeNames().pipe(take(1)).subscribe((data:string[]) => {
       this.pokeNamesList = data;
     });
   }
+  
+  //Generate team 
+  generateTeam(){
+    this.pokeInfosService.generateTeam(this.pokeInfosList).pipe(take(1)).subscribe((data:pokeInfos[]) => {
+      this.pokeInfosList = data;
+      console.log(this.pokeInfosList);
+    });
+  }
+
   
 }

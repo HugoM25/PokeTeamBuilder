@@ -23,9 +23,8 @@ export class PokeDisplayComponent implements OnInit {
   //Used to send data to the parent component
   @Output() pokeNameChange = new EventEmitter<{name:string,index:number}>();
 
+  @Output() pokeLockChange = new EventEmitter<{locked:boolean,index:number}>();
 
-  //Handling the lock button
-  locked: boolean = false;
   imageLock : string = "assets/images/lock_icon_open.png";
 
   //Handling the dropdown menu
@@ -34,25 +33,32 @@ export class PokeDisplayComponent implements OnInit {
 
   ngOnInit(){
     console.log(this.index); 
-
+    this.setGoodIconLock();
   }
 
-  //Lock/Unlock the pokemon
-  lockPoke() {
-    if (this.locked){
-      this.imageLock = "assets/images/lock_icon_open.png";
-      this.locked = false;
-    }
-    else {
-      this.imageLock = "assets/images/lock_icon_closed.png";
-      this.locked = true;
-    }
+ setGoodIconLock(){
+  if (this.pokeInfos.isLocked){
+    this.imageLock = "assets/images/lock_icon_closed.png";
   }
+  else {
+    this.imageLock = "assets/images/lock_icon_open.png";
+  }
+ } 
 
   //Change the pokemon based on the dropdown menu
   setPoke(newEvent: any){
     this.pokeInfos.name = newEvent.target.value;
     this.setPokeParentComponent();
+  }
+
+  //Change lock infos 
+  updateLock(){
+    //emit the event to the parent component
+    this.pokeLockChange.emit({
+      locked: this.pokeInfos.isLocked,
+      index : this.index
+    });
+    this.setGoodIconLock();
   }
 
   //Change the pokemon in the parent component

@@ -15,8 +15,27 @@ def test():
         response.headers.add("Access-Control-Allow-Origin", "*")
         return response, 200
 
-@app.route('/get_pkm_in_tier', methods=["POST"])
-def get_pkm_in_tier():
+@app.route('/get_pkm', methods=["POST"])
+def get_pkm():
+    '''
+    Get the pokemon with the given name
+    '''
+    response = None
+    if request.method == "POST":
+        #Get the data from the request
+        json_data = request.get_json()
+
+        #Get the pokemon
+        pkm = pokeTeamPy.TeamMember(str(json_data["name"]))
+
+        pkm.image_url = "https://play.pokemonshowdown.com/sprites/ani/" + pkm.name + ".gif"
+        #Create the response
+        response = jsonify(pkm.get_data())
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response, 200
+
+@app.route('/get_pkms_in_tier', methods=["POST"])
+def get_pkms_in_tier():
     '''
     Get all pokemon in a given tier
     '''
@@ -43,18 +62,21 @@ def complete_team():
         #Get the data from the request
         json_data = request.get_json()
 
+        curr_team = [member for member in json_data["team"]]
+        print(curr_team[0])
         #Create a team builder
-        team_builder = pokeTeamPy.TeamBuilder()
+        team_builder = pokeTeamPy.TeamBuilder(curr_team)
 
         #Complete team 
-        team_builder.complete_team(json_data["format"], json_data["team"])
+        team_builder.complete_team(db_handler, json_data["format"])
 
         #Get the team
         team = team_builder.get_team()
 
         response = jsonify(team)
         response.headers.add("Access-Control-Allow-Origin", "*")
-        return response, 201
+        return response, 200
+    
 
 
 

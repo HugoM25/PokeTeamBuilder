@@ -92,7 +92,7 @@ class DataBaseHandler:
                     session.execute_write(link_mates_pkms, pkm_key.lower(), mate_key.lower(), tier_data[pkm_key]["Teammates"][mate_key], tier_name)
 
     
-    def find_pkms_linked_to(self, pkm_name, tier_name, nb_pkms=10):
+    def find_pkms_linked_to(self, pkm_name, tier_name, nb_pkms=20):
         '''
         Find the pokemons linked to the given pokemon
         param pkm_name: name of the pokemon
@@ -117,7 +117,6 @@ class DataBaseHandler:
             names_response = session.run("MATCH (p:Pokemon)-[r:IN_TIER]->(t:Tier) WHERE t.name=$tier_name RETURN p.name ORDER BY p.name ", tier_name=tier_name)
             for name in names_response:
                 names.append(str(name[0]))
-        print(names)
         return names
 
 #Static functions for the database -----------------------------------
@@ -189,7 +188,6 @@ def get_pokemon_names_in_format(format_name: str) -> list:
     Returns a list of all pokemon names in a given format
     """
     data = load_json("D:\ProjetsPersos\PokeTeamBuilder\backend\app\static\Json\gen8ou-0.json")
-    print(data)
     pkm_names = list(data['data'].keys())
     return pkm_names
 
