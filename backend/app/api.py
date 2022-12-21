@@ -65,10 +65,10 @@ def complete_team():
         curr_team = [member for member in json_data["team"]]
         print(curr_team[0])
         #Create a team builder
-        team_builder = pokeTeamPy.TeamBuilder(curr_team)
+        team_builder = pokeTeamPy.TeamBuilder(curr_team, tier=json_data["format"], db_handler=db_handler)
 
         #Complete team 
-        team_builder.complete_team(db_handler, json_data["format"])
+        team_builder.complete_team(method="BFS")
 
         #Get the team
         team = team_builder.get_team()

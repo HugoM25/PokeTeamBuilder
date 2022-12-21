@@ -2,13 +2,16 @@ from .teamMember import TeamMember
 import random 
 
 class TeamBuilder:
-    def __init__(self, team=None):
+    def __init__(self, team=None, tier="", db_handler=None):
         self.team_size = 6
         if team is None :
             self.team = [TeamMember() for _ in range(self.team_size)]
         else :
             self.team = [TeamMember(name=member["name"], locked=member["isLocked"]) for member in team]
-    
+
+        self.tier = tier
+        self.db_handler = db_handler
+
     def set_pokemon_at_index(self, index, pokemon):
         '''
         Set the pokemon at the given index
@@ -52,8 +55,48 @@ class TeamBuilder:
         pkm.name = names[random.randint(0, len(names)-1)]
         pkm.image_url = "https://play.pokemonshowdown.com/sprites/ani/" + pkm.name + ".gif"
         return pkm 
+    
+    def find_next_mate_BFS(self, curr_mates_list, names_futur_mates) :
+        '''
+        Complete the team with pokemon from the given tier using BFS approach
+        @param curr_mates_list: The list of the current mates
+        @param names_futur_mates: The list of the names of the futur mates
+        @return: The new member and the new list of the names of the futur mates
+        '''
+        i = 0
+        while i < len(names_futur_mates) :
+            next_mate = TeamMember(names_futur_mates[i])
+            if not self.is_pokemon_in_team(next_mate) :
+                curr_mates_list.append(next_mate)
+                new_mates_list = curr_mates_list
+                names_futur_mates.extend(self.db_handler.find_pkms_linked_to(next_mate.name, self.tier))
+                return next_mate, new_mates_list, names_futur_mates
+            i+=1
 
-    def complete_team(self, db_handler, tier, method="BFS"):
+        #Only happens if all the futur mates are already in the team
+        return None, names_futur_mates
+    
+    def find_next_mate_DFS(self, curr_mates_list, names_futur_mates) :
+        '''
+        Complete the team with pokemon from the given tier using DFS approach
+        @param curr_mates_list: The list of the current mates
+        @param names_futur_mates: The list of the names of the futur mates
+        @return: The new member and the new list of the names of the futur mates
+        '''
+        i = 0
+        while i < len(names_futur_mates) :
+            next_mate = TeamMember(names_futur_mates[i])
+            if not self.is_pokemon_in_team(next_mate) :
+                curr_mates_list.append(next_mate)
+                new_mates_list = curr_mates_list
+                names_futur_mates = self.db_handler.find_pkms_linked_to(next_mate.name, self.tier)
+                return next_mate, new_mates_list, names_futur_mates
+            i+=1
+
+        #Only happens if all the futur mates are already in the team
+        return None, names_futur_mates
+            
+    def complete_team(self, method="BFS"):
         '''
         Complete the team with pokemon from the given tier
         @param db_handler: The database handler to use
@@ -73,42 +116,35 @@ class TeamBuilder:
 
         #Add random pokemon to start the team if it is empty 
         if len(mates_list) < 1 :
-            new_pokemon = self.get_random_pokemon_in_format(db_handler, tier)
+            new_pokemon = self.get_random_pokemon_in_format(self.db_handler, self.tier)
             self.set_pokemon_at_index(0, new_pokemon)
             mates_list.append(new_pokemon)
-
+        #Not recommended
         if method == "BFS" :
-            #Get the pokemons with the most links to the first pokemon
-            next_mates_names = db_handler.find_pkms_linked_to(mates_list[0].name, tier)
-            i = 0
+            next_mates_names = self.db_handler.find_pkms_linked_to(mates_list[0].name, self.tier)
             j = 0
+            while j < len(self.team) :
+                if self.team[j].name == "" or not self.team[j].locked :
+                    self.team[j], mates_list, next_mates_names = self.find_next_mate_BFS(mates_list, next_mates_names)
+                j+=1
+        #Not recommended
+        elif method == "DFS" :
+            next_mates_names = self.db_handler.find_pkms_linked_to(mates_list[0].name, self.tier)
+            j = 0
+            while j < len(self.team) :
+                if self.team[j].name == "" or not self.team[j].locked :
+                    self.team[j], mates_list, next_mates_names = self.find_next_mate_DFS(mates_list, next_mates_names)
+                j+=1
+        #As you wish
+        elif method == "RANDOM" :
+            pass 
+        #Recommended 
+        elif method == "SMART" :
+            pass
+        else : 
+            print("[ERROR] Method not implemented")
 
-            member = self.team[j]
-            next_mate = TeamMember(next_mates_names[i])
-            
-            while j < len(self.team) and i < len(next_mates_names) :
-                #check if next mate name is not already in the team
-                if not self.is_pokemon_in_team(next_mate) :
-                    #if the pokemon is not defined or not locked, add the next mate
-                    if member.name == "" or not member.locked :
-                        self.set_pokemon_at_index(j, next_mate)
-                        #add the next pokemon's links to the list of next possibles mates
-                        next_mates_names.extend(db_handler.find_pkms_linked_to(next_mate.name, tier))
-                        
-                    #Goes to the next slot in the team
-                    member = self.team[j]
-                    j+=1
-                else :
-                    #Goes to the next pokemon in the list of next mates
-                    next_mate = TeamMember(next_mates_names[i])
-                    i+=1
-        
         print(self.team)
-                
-
-                    
-
-
 
     def get_team(self) -> list:
         '''
