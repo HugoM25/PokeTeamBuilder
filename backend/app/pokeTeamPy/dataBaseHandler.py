@@ -90,8 +90,27 @@ class DataBaseHandler:
                 #Add link to teammates
                 for mate_key in tier_data[pkm_key]["Teammates"]:
                     session.execute_write(link_mates_pkms, pkm_key.lower(), mate_key.lower(), tier_data[pkm_key]["Teammates"][mate_key], tier_name)
-
     
+    def add_tier_data_fast(self, tier_data, tier_name) :
+        '''
+        Add the tier data to the database
+        param tier_data: tier data to be loaded
+        param tier_name: name of the tier
+        '''
+        tier_data = tier_data["data"]
+        with self.driver.session(database="pokedb") as session :
+            with session.begin_transaction() as tx:
+                for pkm_key in list(tier_data.keys()):
+                    #Link to tier
+                    #tx.run(link_to_tier, pkm_key.lower(), tier_name)
+                    link_to_tier(tx, pkm_key.lower(), tier_name)
+                    #tx.run("MATCH (p:Pokemon {name: $pkm_name}), (t:Tier {name: $tier_name}) CREATE (p)-[r:IN_TIER]->(t)", pkm_name=pkm_key.lower(), tier_name=tier_name)
+                    #Add link to teammates
+                    for mate_key in tier_data[pkm_key]["Teammates"]:
+                        #tx.run(link_mates_pkms, pkm_key.lower(), mate_key.lower(), tier_data[pkm_key]["Teammates"][mate_key], tier_name)
+                        link_mates_pkms(tx, pkm_key.lower(), mate_key.lower(), tier_data[pkm_key]["Teammates"][mate_key], tier_name)
+                        #tx.run("MATCH (p1:Pokemon {name: $pkm1}),(p2:Pokemon {name: $pkm2}) CREATE (p1)-[r:LINK {value: $link_value, name: $tier_name}]->(p2)", pkm1=pkm_key.lower(), pkm2=mate_key.lower(), link_value=tier_data[pkm_key]["Teammates"][mate_key], tier_name=tier_name)
+
     def find_pkms_linked_to(self, pkm_name, tier_name, nb_pkms=20):
         '''
         Find the pokemons linked to the given pokemon
@@ -129,8 +148,28 @@ class DataBaseHandler:
             for tier in tiers_response:
                 tiers.append(str(tier[0]))
         return tiers
+    
+    def check_if_node_exists(self, label, property_name, property_value ):
+        '''
+        Check if a node exists
+        '''
+        # Execute the Cypher query
+        with self.driver.session(database="pokedb") as session:
+            result = session.run(f"MATCH (a:{label} {{{property_name}: '{property_value}'}}) RETURN a")
+            # Check if the query returned a record
+            if result.single() :
+                return True
+            else :
+                return False
 
 #Static functions for the database -----------------------------------
+def create_tier(tx, name) :
+    '''
+    Creates a tier node
+    param tx: transaction
+    param name: name of the tier
+    '''
+    tx.run("CREATE (t:Tier {name: $name})", name=name)
 
 def create_pokemon(tx, name, num, stats, heightm, weightkg):
     '''
@@ -227,6 +266,8 @@ def initialize_db():
     print("Done")
 
 def update_db():
+    import time 
+    start_time = time.time()
     db_handler = DataBaseHandler()
     #Remove links mate data 
     db_handler.clear_mates_links()
@@ -234,22 +275,25 @@ def update_db():
     files_tracked = load_json(r"D:\ProjetsPersos\PokeTeamBuilder\backend\app\static\Json\settings.json")
 
     for tier in files_tracked["tiersTracked"]:
+        if db_handler.check_if_node_exists("Tier", "name", tier) == False:
+            #Create the tier node
+            with db_handler.driver.session() as session:
+                session.write_transaction(create_tier, tier)
+        #Add data to db 
         file_name = files_tracked["tiersTracked"][tier]["fileNameShowdown"]
         tier_data = load_json_url("https://www.smogon.com/stats/2022-11/chaos/{}".format(file_name))
-        db_handler.add_tier_data(tier_data=tier_data, tier_name=tier)
+        db_handler.add_tier_data_fast(tier_data=tier_data, tier_name=tier)
+        print("Done for {}".format(tier))
+    print("Time taken : {}".format(time.time() - start_time))
+    print("Done")
 
 
 
 if __name__ == "__main__" :
     '''
-    When the script is run, the database is updated with the data from the tiers tracked
+    When the script running as main, the database is updated with the data from the tiers tracked
     '''
-    #update_db()
-    db_handler = DataBaseHandler()
-    res = db_handler.find_pkms_linked_to("gardevoir", "GEN8OU", 10)
-    print(res)
-    for record in res:
-        print(record["pkm"]["name"])
+    update_db()
 
 
     
