@@ -16,6 +16,8 @@ export class CommandsElementsComponent implements OnInit {
   @Input() availableTiers!: string[];
   
   @Input() activeTier!: string;
+
+  @Input() isLoadingTeam!: boolean;
   
   constructor() { 
 
@@ -25,12 +27,14 @@ export class CommandsElementsComponent implements OnInit {
   }
 
   setTier(newEvent : any){
+
     this.onTierChange.emit({
       tier : newEvent.target.value
     })
   }
 
   generateTeam(){
+    console.log(this.isLoadingTeam);
     this.onGenerate.emit({
       tier : this.activeTier
     });

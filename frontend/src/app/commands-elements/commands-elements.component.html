@@ -2,6 +2,6 @@
     <select class="select-tier"  (change)="setTier($event)" [value]="activeTier">
         <option *ngFor="let tier of availableTiers" [value]="tier" [selected]="tier == activeTier">{{tier}}</option>
     </select>
-    <button class="button-1" (click)="generateTeam()">GENERATE TEAM</button>
+    <button class="button-1" (click)="generateTeam()" [class.spinner]="isLoadingTeam" [disabled]="isLoadingTeam ? true : null">GENERATE TEAM</button>
     <button class="button-1">COPY TEAM</button>
 </div>
