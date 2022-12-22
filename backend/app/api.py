@@ -68,7 +68,7 @@ def complete_team():
         team_builder = pokeTeamPy.TeamBuilder(curr_team, tier=json_data["format"], db_handler=db_handler)
 
         #Complete team 
-        team_builder.complete_team(method="BFS")
+        team_builder.complete_team(method="SMART")
 
         #Get the team
         team = team_builder.get_team()

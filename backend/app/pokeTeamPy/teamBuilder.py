@@ -95,7 +95,34 @@ class TeamBuilder:
 
         #Only happens if all the futur mates are already in the team
         return None, names_futur_mates
-            
+    
+    def find_next_mate_SMART (self, curr_mates_list, dict_futur_mates) :
+        '''
+        Complete the team with pokemon from the given tier using smart approach
+        @param curr_mates_list: The list of the current mates
+        @param names_futur_mates: The list of the names of the futur mates
+        @return: The new member and the new list of the names of the futur mates
+        '''
+        #Find key with the largest value
+        max_key = max(dict_futur_mates, key=dict_futur_mates.get)
+        next_mate = TeamMember(max_key)
+
+        while self.is_pokemon_in_team(next_mate) :
+            del dict_futur_mates[max_key]
+            max_key = max(dict_futur_mates, key=dict_futur_mates.get)
+            next_mate = TeamMember(max_key)
+        curr_mates_list.append(next_mate)
+        relevence_index = 1
+        next_mates_names = self.db_handler.find_pkms_linked_to(next_mate.name, self.tier)
+        for name in next_mates_names :
+            if name in dict_futur_mates :
+                dict_futur_mates[name] += 1 / relevence_index
+            else :
+                dict_futur_mates[name] = 1 / relevence_index
+            relevence_index += 1
+
+        return next_mate, curr_mates_list, dict_futur_mates
+
     def complete_team(self, method="BFS"):
         '''
         Complete the team with pokemon from the given tier
@@ -140,7 +167,23 @@ class TeamBuilder:
             pass 
         #Recommended 
         elif method == "SMART" :
-            pass
+            next_mate_dict = {}
+            #Fill next_mate_dict with the names of the next mates and their number of occurences
+            for mate in mates_list :
+                relevence_index = 1
+                next_mates_names = self.db_handler.find_pkms_linked_to(mate.name, self.tier)
+                for name in next_mates_names :
+                    if name in next_mate_dict :
+                        next_mate_dict[name] += 1 / relevence_index
+                    else :
+                        next_mate_dict[name] = 1 / relevence_index
+                    relevence_index += 1
+            
+            j = 0
+            while j < len(self.team) :
+                if self.team[j].name == "" or not self.team[j].locked :
+                    self.team[j], mates_list, next_mates_names = self.find_next_mate_SMART(mates_list, next_mate_dict)
+                j+=1
         else : 
             print("[ERROR] Method not implemented")
 
