@@ -118,6 +118,17 @@ class DataBaseHandler:
             for name in names_response:
                 names.append(str(name[0]))
         return names
+    
+    def get_tiers(self) :
+        '''
+        Get the tiers
+        '''
+        tiers = []
+        with self.driver.session(database="pokedb") as session :
+            tiers_response = session.run("MATCH (t:Tier) RETURN t.name ORDER BY t.name")
+            for tier in tiers_response:
+                tiers.append(str(tier[0]))
+        return tiers
 
 #Static functions for the database -----------------------------------
 

@@ -23,17 +23,23 @@ export class PokeInfosServiceService {
     return req;
   }
 
-  getPokeNames():Observable<string[]> {
-    const body = { tier : "GEN8OU" };
+  getPokeNames(tier:string):Observable<string[]> {
+    const body = { tier : tier };
     const req = this.http.post<string[]>('http://127.0.0.1:5000/get_pkms_in_tier', body);
     req.subscribe();
     return req;
   }
 
-  generateTeam(teamPoke:pokeInfos[]):Observable<pokeInfos[]> {
+  getTiersNames():Observable<string[]> {
+    const req = this.http.get<string[]>('http://127.0.0.1:5000/get_tiers');
+    req.subscribe();
+    return req;
+  }
+
+  generateTeam(teamPoke:pokeInfos[], tier:string):Observable<pokeInfos[]> {
     const body = { 
       team : teamPoke, 
-      format : "GEN8OU"
+      tier : tier
     };
     console.log(teamPoke[0]);
     const req = this.http.post<pokeInfos[]>('http://127.0.0.1:5000/complete_team', body);

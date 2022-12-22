@@ -52,6 +52,22 @@ def get_pkms_in_tier():
         response.headers.add("Access-Control-Allow-Origin", "*")
         return response, 200
 
+@app.route('/get_tiers', methods=["GET"])
+def get_tiers():
+    '''
+    Get the tiers available in the database
+    '''
+    response = None
+    if request.method == "GET":
+        #Get the tiers
+        tiers = db_handler.get_tiers()
+
+        #Create the response
+        response = jsonify(tiers)
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response, 200
+        
+    
 @app.route('/complete_team', methods=["POST"])
 def complete_team():
     '''
@@ -65,7 +81,7 @@ def complete_team():
         curr_team = [member for member in json_data["team"]]
         print(curr_team[0])
         #Create a team builder
-        team_builder = pokeTeamPy.TeamBuilder(curr_team, tier=json_data["format"], db_handler=db_handler)
+        team_builder = pokeTeamPy.TeamBuilder(curr_team, tier=json_data["tier"], db_handler=db_handler)
 
         #Complete team 
         team_builder.complete_team(method="SMART")

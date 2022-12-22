@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { SharedServiceService } from '../services/shared-service.service';
 import { OnInit } from '@angular/core';
 import { Output, EventEmitter, Input } from '@angular/core';
 @Component({
@@ -12,20 +11,28 @@ export class CommandsElementsComponent implements OnInit {
 
   @Output() onGenerate = new EventEmitter<{tier:string}>();
 
-  @Input() availableFormats!: string[];
+  @Output() onTierChange = new EventEmitter<{tier:string}>();
+
+  @Input() availableTiers!: string[];
   
-  activeformat!: string;
+  @Input() activeTier!: string;
   
-  constructor(private sharedService: SharedServiceService) { 
+  constructor() { 
 
   }
 
   ngOnInit(): void {
   }
 
+  setTier(newEvent : any){
+    this.onTierChange.emit({
+      tier : newEvent.target.value
+    })
+  }
+
   generateTeam(){
     this.onGenerate.emit({
-      tier : this.activeformat
+      tier : this.activeTier
     });
   }
 

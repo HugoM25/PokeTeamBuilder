@@ -33,3 +33,21 @@
     /*Position*/
     margin-top: 5%;
 }
+
+.select-tier {
+
+    border: solid;
+    justify-content: center;
+    position: relative;
+    width: fit-content;
+
+    /*Center*/
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+
+    border-radius: 16px;
+    text-align: center;
+    flex-shrink: 1;
+    z-index: 4;
+}
