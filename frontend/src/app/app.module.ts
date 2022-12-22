@@ -4,18 +4,18 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PokeDisplayComponent } from './poke-display/poke-display.component';
-import { PokeDisplayListComponent } from './poke-display-list/poke-display-list.component';
 import { HttpClientModule } from '@angular/common/http';
 import { HeaderComponent } from './header/header.component';
 import { CommandsElementsComponent } from './commands-elements/commands-elements.component';
+import { TeamPageComponent } from './team-page/team-page.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     PokeDisplayComponent,
-    PokeDisplayListComponent,
     HeaderComponent,
-    CommandsElementsComponent
+    CommandsElementsComponent,
+    TeamPageComponent
   ],
   imports: [
     BrowserModule,

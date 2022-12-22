@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { SharedServiceService } from '../services/shared-service.service';
 import { OnInit } from '@angular/core';
-
+import { Output, EventEmitter, Input } from '@angular/core';
 @Component({
   selector: 'app-commands-elements',
   templateUrl: './commands-elements.component.html',
@@ -10,6 +10,12 @@ import { OnInit } from '@angular/core';
 
 export class CommandsElementsComponent implements OnInit {
 
+  @Output() onGenerate = new EventEmitter<{tier:string}>();
+
+  @Input() availableFormats!: string[];
+  
+  activeformat!: string;
+  
   constructor(private sharedService: SharedServiceService) { 
 
   }
@@ -18,6 +24,9 @@ export class CommandsElementsComponent implements OnInit {
   }
 
   generateTeam(){
-    this.sharedService.sendClickEvent();
+    this.onGenerate.emit({
+      tier : this.activeformat
+    });
   }
+
 }
