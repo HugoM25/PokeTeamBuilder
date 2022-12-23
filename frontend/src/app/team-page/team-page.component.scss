@@ -1,0 +1,16 @@
+.poke-container {
+    display: flex;
+    justify-content: center;
+    width: 50%;
+    flex-direction: column;
+    //Center the container
+    margin: 0 auto;
+
+    @media (min-width: 800px) {
+        flex-direction: row;
+        width: 90%;
+    }
+}
+.poke-item {
+    flex-direction: row;
+}

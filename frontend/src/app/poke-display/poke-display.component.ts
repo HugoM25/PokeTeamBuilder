@@ -1,7 +1,7 @@
 import { Component} from '@angular/core';
 import { pokeInfos } from '../models/poke-infos.model';
 import { PokeInfosServiceService } from '../services/poke-infos-service.service';
-import { Input, OnInit, Output, EventEmitter} from '@angular/core';
+import { Input, OnInit, Output, EventEmitter, OnChanges} from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 @Component({
@@ -14,6 +14,15 @@ export class PokeDisplayComponent implements OnInit {
   //Used to get the pokeInfos from the parent component
   @Input() pokeInfos!: pokeInfos; 
 
+  //This is used to prevent destruction of component
+  localPokeInfos : pokeInfos = {
+    id : -1,
+    name: "",
+    isLocked: false,
+    imageUrl : "assets/images/default.png"
+  };
+
+  @Input() needRefresh!: boolean;
   //Index of position in team list
   @Input() index!: number;
 
@@ -27,14 +36,13 @@ export class PokeDisplayComponent implements OnInit {
 
   imageLock : string = "assets/images/lock_icon_open.png";
 
-  //Handling the dropdown menu
-
   constructor(private pokeInfosService: PokeInfosServiceService) {  }
 
   ngOnInit(){
     console.log(this.index); 
     this.setGoodIconLock();
   }
+
 
  setGoodIconLock(){
   if (this.pokeInfos.isLocked){
