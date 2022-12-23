@@ -41,7 +41,6 @@ export class PokeInfosServiceService {
       team : teamPoke, 
       tier : tier
     };
-    console.log(teamPoke[0]);
     const req = this.http.post<pokeInfos[]>('http://127.0.0.1:5000/complete_team', body);
     return req; 
   }

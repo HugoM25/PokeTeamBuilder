@@ -58,24 +58,27 @@ export class TeamPageComponent implements OnInit {
 
   ngOnInit(): void {
     //Get the list of pokemon names
-    this.resetTeam();
+    this.initiateTeam();
     this.getTiers(); 
     this.setNames();
   }
 
   //Reset team to blank values
-  resetTeam(){
+  initiateTeam(){
     for (let i = 0; i < 6; i++){
       this.teamList[i] = structuredClone(this.blankPokeInfos);
+    }
+  }
+
+  resetTeam(){
+    for (let i = 0; i < 6; i++){
+      this.teamList[i] = this.copyMember(this.teamList[i],this.blankPokeInfos);
     }
   }
 
   //Generate a team in the given tier
   generateTeam(object : {tier:string}){
     this.isLoading = true;
-    //Debug
-    console.log("generate team");
-    console.log(object.tier);
     //Ask backend for a team
     this.pokeInfosService.generateTeam(this.teamList, this.tierActive).pipe(take(1)).subscribe((data:pokeInfos[]) => {
       this.setTeam(data);
@@ -86,9 +89,6 @@ export class TeamPageComponent implements OnInit {
 
   //Change the pokemon at index in team 
   changePoke(object: {name:string,index:number}){
-    //Shows the desired request
-    console.log(object.name);
-    console.log(object.index);
     //Execute the request
     this.pokeInfosService.getPokeData(object.name).pipe(take(1)).subscribe((data:pokeInfos) => {
       this.teamList[object.index] = data;

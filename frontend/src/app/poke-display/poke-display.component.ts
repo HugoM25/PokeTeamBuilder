@@ -39,7 +39,6 @@ export class PokeDisplayComponent implements OnInit {
   constructor(private pokeInfosService: PokeInfosServiceService) {  }
 
   ngOnInit(){
-    console.log(this.index); 
     this.setGoodIconLock();
   }
 

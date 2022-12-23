@@ -34,7 +34,6 @@ export class CommandsElementsComponent implements OnInit {
   }
 
   generateTeam(){
-    console.log(this.isLoadingTeam);
     this.onGenerate.emit({
       tier : this.activeTier
     });
