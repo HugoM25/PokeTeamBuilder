@@ -1,39 +1,48 @@
-
-/*
 .div-header {
-    Header with drop shadow
-    background-color: #f2f2f2;
+    background: #ff3838;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
     height: 100%;
     width: 100%;
-    padding-top: 2%;
-    padding-bottom: 1%;
-    margin-bottom: 5%;
-}*/
-
-.div-header {
-    /*Border */
-    border: solid;
-    border-color: #383838;
-    border-radius: 16px;
-
-    /*Backgroud*/
-    background-image: linear-gradient(to bottom, #e93232 90%, #383838 90% 95%, #ffffff 95% 100%);
-
-    /*Center*/
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-
-    /*Size*/
-    padding: 1%;
-    margin-bottom: 5%;
-
-
+    margin-bottom: 3%;
 }
 
 .title-text {
     font-size: 2.5em;
     text-align: center;
-    color: #ffffff;
+    color: #FFFFFF;
+}
+
+
+.nav-bar {
+    //Create a nav bar horizontally under the div header
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    flex-direction: row;
+}
+
+.button-header {
+      align-items: center;
+      background: #FFFFFF;
+      border: 0 solid #E2E8F0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      box-sizing: border-box;
+      color: #1A202C;
+      display: inline-flex;
+      font-family: Inter, sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      height: 56px;
+      justify-content: center;
+      line-height: 24px;
+      overflow-wrap: break-word;
+      padding: 24px;
+      text-decoration: none;
+      width: 10%;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
 }

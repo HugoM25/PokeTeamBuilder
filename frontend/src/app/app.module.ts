@@ -8,6 +8,7 @@ import { HeaderComponent } from './header/header.component';
 import { CommandsElementsComponent } from './commands-elements/commands-elements.component';
 import { TeamPageComponent } from './team-page/team-page.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { StatsPageComponent } from './stats-page/stats-page.component';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     PokeDisplayComponent,
     HeaderComponent,
     CommandsElementsComponent,
-    TeamPageComponent
+    TeamPageComponent,
+    StatsPageComponent
   ],
   imports: [
     BrowserModule,
