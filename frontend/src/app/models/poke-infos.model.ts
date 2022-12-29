@@ -1,6 +1,5 @@
-import { Input } from "@angular/core";
 
-export class pokeInfos {
+export class PokeInfos {
     id!: number;
     name!: string; 
     imageUrl!: string;

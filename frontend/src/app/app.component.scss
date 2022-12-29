@@ -1,0 +1,23 @@
+.content {
+    /*Create a flexbox containre */
+    display: flex;
+    /*Display the items vertically 
+    (top to bottom) */
+    flex-direction: column;
+
+}
+
+.header {
+    /*Set height to 25% of the parent*/
+    height: 25%;
+    /*Set width to 100% of the parent*/
+    width: 100%;
+}
+
+.main{
+    /*Set the width to 100% of the parent*/
+    width: 100%;
+    /*Set the height to auto*/
+    height: auto;   
+}
+

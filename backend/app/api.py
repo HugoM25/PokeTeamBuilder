@@ -13,6 +13,8 @@ def test():
         team_builder = pokeTeamPy.TeamBuilder()
         response = jsonify(team_builder.get_team())
         response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Set-Cookie','cross-site-cookie=bar; SameSite=None; Secure')
+
         return response, 200
 
 @app.route('/get_pkm', methods=["POST"])
@@ -32,6 +34,8 @@ def get_pkm():
         #Create the response
         response = jsonify(pkm.get_data())
         response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Set-Cookie','cross-site-cookie=bar; SameSite=None; Secure')
+
         return response, 200
 
 @app.route('/get_pkms_in_tier', methods=["POST"])
@@ -50,6 +54,8 @@ def get_pkms_in_tier():
         #Create the response
         response = jsonify(pkm_names)
         response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Set-Cookie','cross-site-cookie=bar; SameSite=None; Secure')
+
         return response, 200
 
 @app.route('/get_tiers', methods=["GET"])
@@ -65,6 +71,8 @@ def get_tiers():
         #Create the response
         response = jsonify(tiers)
         response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Set-Cookie','cross-site-cookie=bar; SameSite=None; Secure')
+
         return response, 200
         
     
@@ -91,6 +99,8 @@ def complete_team():
 
         response = jsonify(team)
         response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Set-Cookie','cross-site-cookie=bar; SameSite=None; Secure')
+
         return response, 200
     
 

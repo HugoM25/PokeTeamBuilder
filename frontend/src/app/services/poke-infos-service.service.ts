@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { pokeInfos } from '../models/poke-infos.model';
+import { PokeInfos } from '../models/poke-infos.model';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -12,13 +12,13 @@ export class PokeInfosServiceService {
   constructor(private http:HttpClient) { }
 
   //Get the list of pokeInfos from the backend
-  getPokeInfosList() : Observable<pokeInfos[]> {
-    return this.http.get<pokeInfos[]>('http://127.0.0.1:5000');
+  getPokeInfosList() : Observable<PokeInfos[]> {
+    return this.http.get<PokeInfos[]>('http://127.0.0.1:5000');
   }
 
-  getPokeData(pokeName: string) : Observable<pokeInfos> {
+  getPokeData(pokeName: string) : Observable<PokeInfos> {
     const body = { name: pokeName };
-    const req = this.http.post<pokeInfos>('http://127.0.0.1:5000/get_pkm', body);
+    const req = this.http.post<PokeInfos>('http://127.0.0.1:5000/get_pkm', body);
     req.subscribe();
     return req;
   }
@@ -36,12 +36,12 @@ export class PokeInfosServiceService {
     return req;
   }
 
-  generateTeam(teamPoke:pokeInfos[], tier:string):Observable<pokeInfos[]> {
+  generateTeam(teamPoke:PokeInfos[], tier:string):Observable<PokeInfos[]> {
     const body = { 
       team : teamPoke, 
       tier : tier
     };
-    const req = this.http.post<pokeInfos[]>('http://127.0.0.1:5000/complete_team', body);
+    const req = this.http.post<PokeInfos[]>('http://127.0.0.1:5000/complete_team', body);
     return req; 
   }
 

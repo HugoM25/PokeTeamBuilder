@@ -1,6 +1,8 @@
 <!-- Team display -->
-<div class="poke-container" @team>
-    <app-poke-display *ngFor="let member of teamList; let i = index"  @memberAnimation [pokeNamesList]="namesAvailable" [index]="i" [pokeInfos]="member" (pokeNameChange)="changePoke($event)" (pokeLockChange)="changeLock($event)" class="poke-item"></app-poke-display> 
+<div class="team-page-container">
+    <div class="poke-container" @team>
+        <app-poke-display *ngFor="let member of teamList; let i = index"  @memberAnimation [pokeNamesList]="namesAvailable" [index]="i" [pokeInfos]="member" (pokeNameChange)="changePoke($event)" (pokeLockChange)="changeLock($event)" class="poke-item"></app-poke-display> 
+    </div>
+    <!--Buttons part and dropdown for format selection-->
+    <app-commands-elements (onGenerate)="generateTeam($event)" (onTierChange)="changeTier($event)" [availableTiers]="tiersAvailable" [activeTier]="tierActive" [isLoadingTeam]="isLoading"></app-commands-elements>
 </div>
-<!--Buttons part and dropdown for format selection-->
-<app-commands-elements (onGenerate)="generateTeam($event)" (onTierChange)="changeTier($event)" [availableTiers]="tiersAvailable" [activeTier]="tierActive" [isLoadingTeam]="isLoading"></app-commands-elements>

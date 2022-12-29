@@ -2,9 +2,9 @@ class TeamMember :
     def __init__(self, name="", image_url="assets/images/default.png", locked=False ):
         self.name = name
         if name != "" :
-            #self.image_url = "https://play.pokemonshowdown.com/sprites/ani/" + name + ".gif"
+            self.image_url = "https://play.pokemonshowdown.com/sprites/ani/" + name + ".gif"
             #Till gen9 gifs are not available use this one
-            self.image_url = "https://play.pokemonshowdown.com/sprites/dex/" + name + ".png"
+            #self.image_url = "https://play.pokemonshowdown.com/sprites/dex/" + name + ".png"
         else :
             self.image_url = image_url
         self.locked = locked

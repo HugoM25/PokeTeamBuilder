@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { PokeInfosServiceService } from '../services/poke-infos-service.service';
 import { OnInit } from '@angular/core';
-import { pokeInfos } from '../models/poke-infos.model';
+import { PokeInfos } from '../models/poke-infos.model';
 import { take } from 'rxjs/operators';
 import { trigger, state, style, transition, animate, query, stagger, animateChild } from '@angular/animations';
 
@@ -35,7 +35,7 @@ import { trigger, state, style, transition, animate, query, stagger, animateChil
 })
 export class TeamPageComponent implements OnInit {
 
-  teamList: pokeInfos[] = [];
+  teamList: PokeInfos[] = [];
 
   
   tiersAvailable: string[] = [];
@@ -45,7 +45,7 @@ export class TeamPageComponent implements OnInit {
   isLoading: boolean = false;
 
   //Blank pokemon template
-  blankPokeInfos: pokeInfos = {
+  blankPokeInfos: PokeInfos = {
     id : -1,
     name: "",
     isLocked: false,
@@ -80,7 +80,7 @@ export class TeamPageComponent implements OnInit {
   generateTeam(object : {tier:string}){
     this.isLoading = true;
     //Ask backend for a team
-    this.pokeInfosService.generateTeam(this.teamList, this.tierActive).pipe(take(1)).subscribe((data:pokeInfos[]) => {
+    this.pokeInfosService.generateTeam(this.teamList, this.tierActive).pipe(take(1)).subscribe((data:PokeInfos[]) => {
       this.setTeam(data);
       this.isLoading = false;
     });
@@ -90,8 +90,8 @@ export class TeamPageComponent implements OnInit {
   //Change the pokemon at index in team 
   changePoke(object: {name:string,index:number}){
     //Execute the request
-    this.pokeInfosService.getPokeData(object.name).pipe(take(1)).subscribe((data:pokeInfos) => {
-      this.teamList[object.index] = data;
+    this.pokeInfosService.getPokeData(object.name).pipe(take(1)).subscribe((data:PokeInfos) => {
+      this.teamList[object.index] = this.copyMember(this.teamList[object.index], data);
     });
   }
   
@@ -111,24 +111,19 @@ export class TeamPageComponent implements OnInit {
     });
   }
 
-  setTeam(team:pokeInfos[]){
+  setTeam(team:PokeInfos[]){
     //Allow to copy attributes of pokemon without changing references
     //This is necessary to avoid component destruction on change
     for (let i = 0; i < 6; i++){
-      this.teamList[i] = this.copyMember2(this.teamList[i], team[i]);
+      this.teamList[i] = this.copyMember(this.teamList[i], team[i]);
     }
   }
 
-  copyMember(member:pokeInfos, memberToCopy:pokeInfos): pokeInfos{
+  copyMember(member:PokeInfos, memberToCopy:PokeInfos): PokeInfos{
     member.id = memberToCopy.id;
     member.name = memberToCopy.name;
     member.imageUrl = memberToCopy.imageUrl;
     member.isLocked = memberToCopy.isLocked;
-    return member;
-  }
-
-  copyMember2(member:pokeInfos, memberToCopy:pokeInfos): pokeInfos{
-    member = Object.assign(member, memberToCopy);
     return member;
   }
 

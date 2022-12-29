@@ -1,5 +1,5 @@
 import { Component} from '@angular/core';
-import { pokeInfos } from '../models/poke-infos.model';
+import { PokeInfos } from '../models/poke-infos.model';
 import { PokeInfosServiceService } from '../services/poke-infos-service.service';
 import { Input, OnInit, Output, EventEmitter, OnChanges} from '@angular/core';
 import { FormControl } from '@angular/forms';
@@ -12,10 +12,10 @@ import { FormControl } from '@angular/forms';
 export class PokeDisplayComponent implements OnInit {
 
   //Used to get the pokeInfos from the parent component
-  @Input() pokeInfos!: pokeInfos; 
+  @Input() pokeInfos!: PokeInfos; 
 
   //This is used to prevent destruction of component
-  localPokeInfos : pokeInfos = {
+  localPokeInfos : PokeInfos = {
     id : -1,
     name: "",
     isLocked: false,

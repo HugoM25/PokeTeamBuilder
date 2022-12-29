@@ -4,7 +4,8 @@
     border-radius: 8px;
     height: 100%;
     width: 100%;
-    margin-bottom: 3%;
+    padding-bottom:0.5% ;
+    padding-top:1% ;
 }
 
 .title-text {
@@ -20,29 +21,6 @@
     justify-content: center;
     width: 100%;
     flex-direction: row;
+    margin-bottom: 2%;
 }
 
-.button-header {
-      align-items: center;
-      background: #FFFFFF;
-      border: 0 solid #E2E8F0;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      box-sizing: border-box;
-      color: #1A202C;
-      display: inline-flex;
-      font-family: Inter, sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      height: 56px;
-      justify-content: center;
-      line-height: 24px;
-      overflow-wrap: break-word;
-      padding: 24px;
-      text-decoration: none;
-      width: 10%;
-      border-radius: 8px;
-      cursor: pointer;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: manipulation;
-}

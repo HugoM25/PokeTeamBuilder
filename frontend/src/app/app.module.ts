@@ -9,6 +9,7 @@ import { CommandsElementsComponent } from './commands-elements/commands-elements
 import { TeamPageComponent } from './team-page/team-page.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StatsPageComponent } from './stats-page/stats-page.component';
+import { GraphItemComponent } from './graph-item/graph-item.component';
 
 @NgModule({
   declarations: [
@@ -17,13 +18,15 @@ import { StatsPageComponent } from './stats-page/stats-page.component';
     HeaderComponent,
     CommandsElementsComponent,
     TeamPageComponent,
-    StatsPageComponent
+    StatsPageComponent,
+    GraphItemComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    
   ],
   providers: [],
   bootstrap: [AppComponent]

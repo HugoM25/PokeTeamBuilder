@@ -1,1 +1,4 @@
-<p>stats-page works!</p>
+
+<div class="chart-items-container">
+    <app-graph-item *ngFor="let chartInfos of chartList; let i = index" [graphInfos]="chartInfos" [index]="i"></app-graph-item>
+</div>
