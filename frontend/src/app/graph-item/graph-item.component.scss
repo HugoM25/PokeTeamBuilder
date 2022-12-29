@@ -1,0 +1,21 @@
+
+
+.chart-display {
+    //Align items to center
+    align-items: center;
+    //Create a flexbox container
+    display: flex;
+    //Display the items vertically
+    flex-direction: column;
+    width: 300px;
+    background-color: white;
+
+    //Add a shadow under 
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+}
+
+.title-chart {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+}
