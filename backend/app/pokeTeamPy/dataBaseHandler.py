@@ -195,6 +195,10 @@ class DataBaseHandler:
                     dbu.query_link_to_tier(tx,clean_pkm_key, tier_name)
 
                     #Add tier infos on pokemon mates
+                    import time
+
+                    time_st = time.time()
+
                     for mate_key in tier_data[pkm_key]["Teammates"]:
                         clean_mate_key = remove_non_letters(mate_key.lower())
                         if self.check_if_link_exists("Pokemon", "Pokemon",clean_pkm_key, clean_mate_key, "LINK") :
@@ -202,6 +206,19 @@ class DataBaseHandler:
                         else : 
                            dbu.query_create_value_link_nodes(tx, "LINK", "Pokemon", "Pokemon", clean_pkm_key, clean_mate_key, tier_name, tier_data[pkm_key]["Teammates"][mate_key])
                     
+                    print("Time for mates v1", time.time() - time_st)
+
+                    time_st = time.time()
+
+                    list_mates_clean = [remove_non_letters(mate_key) for mate_key in tier_data[pkm_key]["Teammates"].keys()]
+                    list_values = list(tier_data[pkm_key]["Teammates"].values())
+                    dbu.query_set_list_node(tx, pkm_key, list_mates_clean, list_values, "LINK", "Pokemon", "Pokemon", tier_name)
+                    
+
+                    print("Time for mates v2", time.time() - time_st)
+
+                    
+
                     #Add link to moves
                     for move_key in tier_data[pkm_key]["Moves"]:
                         clean_move_key = remove_non_letters(move_key.lower())
@@ -399,6 +416,18 @@ WITH m, sum(r.value) as totalMateValue
 ORDER BY totalMateValue DESC
 LIMIT 10
 RETURN m.name as nextBestMates , totalMateValue
+'''
+
+
+'''
+WITH [0.5,1.3,0.4,0.9] as values, ["pelipper", "charmander", "charizard", "pikachu"] AS names
+UNWIND names AS name
+MATCH (p:Pokemon {name: name})
+WITH p, name, reduce(acc = [], i IN range(0, size(values) - 1) | 
+  acc + CASE WHEN names[i] = name THEN [values[i]] ELSE [] END) AS link_value
+MATCH (m:Move {name: "dragondance"})
+CREATE (p)-[r:KNOWS]->(m)
+SET r.GEN = link_value[0]
 '''
 
 if __name__ == "__main__" :

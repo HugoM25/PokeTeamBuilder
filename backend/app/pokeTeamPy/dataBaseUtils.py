@@ -237,3 +237,27 @@ def query_create_link_mates(tx, pkm1_name, pkm2_name, property_name, value):
     '''
     tx.run(f"MATCH (p1:Pokemon), (p2:Pokemon) WHERE p1.name = '{pkm1_name}' AND p2.name = '{pkm2_name}' CREATE (p1)-[r:LINK {{{property_name}:{value}}}]->(p2)")
 
+
+
+#Queries to link multiple pokemon mates to one
+
+def query_set_list_node(tx, main_node_name, list_nodes_names, list_link_values, link_type, nodes_type, main_node_type, tier="GEN") :
+    """
+    Links multiple nodes to one
+    @param tx: transaction
+    @param main_node_name: name of the main node
+    @param list_nodes_names: list of the names of the nodes to link
+    @param list_link_values: list of the values of the links
+    @param link_type: type of the link
+    @param nodes_type: type of the nodes to link
+    @param main_node_type: type of the main node
+    """
+    query = f"""WITH {list_link_values} as values, {list_nodes_names} AS names
+               UNWIND names AS name
+               MATCH (p:{nodes_type} {{name: name}})
+               WITH p, name, reduce(acc = [], i IN range(0, size(values) - 1) | 
+               acc + CASE WHEN names[i] = name THEN [values[i]] ELSE [] END) AS link_value
+               MATCH (m:{main_node_type} {{name: "{main_node_name}"}})
+               CREATE (p)-[r:{link_type}]->(m)
+               SET r.{tier} = link_value[0]"""
+    tx.run(query)
