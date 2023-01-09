@@ -1,11 +1,13 @@
 from neo4j import GraphDatabase 
 import json 
 from urllib.request import urlopen
-
+import dataBaseUtils as dbu
+from utils import load_json, remove_non_letters
+from teamElements import Move
 
 class DataBaseHandler:
     def __init__(self):
-        self.uri = "neo4j://localhost:7687"
+        self.uri = "bolt://127.0.0.1:7687"
         #development password, will be changed at release
         self.driver = GraphDatabase.driver(self.uri, auth=("neo4j", "j4oen"))
 
@@ -18,6 +20,22 @@ class DataBaseHandler:
             session.run("MATCH ()-[r:IN_TIER]->() DELETE r")
         self.driver.close() 
     
+    def clear_current_tiers_links(self) :
+        '''
+        Clear the current tiers links in the database
+        '''
+        with self.driver.session(database="pokedb") as session:
+            #Delete the tiers links
+            session.run("MATCH ()-[r:IN_TIER]->() DELETE r")
+            #Delete the mates links
+            session.run("MATCH ()-[r:LINK]->() DELETE r")
+            #Delete the items links
+            session.run("MATCH ()-[r:USES]->() DELETE r")
+            #Delete the moves links
+            session.run("MATCH ()-[r:KNOWS]->() DELETE r")
+            #Delete the abilities links
+            session.run("MATCH ()-[r:HAS]->() DELETE r")
+
     def clear_db(self):
         """
         Clear the database
@@ -37,13 +55,52 @@ class DataBaseHandler:
             #add constraint to avoid duplicates
             
             #for every pokemon in pkdex data 
-            for pkm_key in list(json_data.keys()):
+            for pkm_key in list(pokedex_data.keys()):
                 #Check the isNonStandard field to see if it is a real pokemon
                 if pokedex_data[pkm_key].get("isNonstandard") is None or 'CAP' not in pokedex_data[pkm_key]["isNonstandard"] and 'LGPE' not in pokedex_data[pkm_key]["isNonstandard"] and 'Custom' not in pokedex_data[pkm_key]["isNonstandard"]:
                     #Create the pokemon
-                    session.execute_write(create_pokemon, pkm_key, pokedex_data[pkm_key]["num"], pokedex_data[pkm_key]["baseStats"], pokedex_data[pkm_key]["heightm"], pokedex_data[pkm_key]["weightkg"])
+                    session.execute_write(dbu.query_create_pokemon, pkm_key, pokedex_data[pkm_key]["num"], pokedex_data[pkm_key]["baseStats"], pokedex_data[pkm_key]["heightm"], pokedex_data[pkm_key]["weightkg"])
                     print("added", pkm_key, "number :", pokedex_data[pkm_key]["num"])
     
+    def load_moves_data_in_db(self, moves_data): 
+        """
+        Load the moves data into the database 
+        param moves_data: moves data to be loaded
+        """
+        for move_key in list(moves_data.keys()):
+            #Check the isNonStandard field to see if it is a real move
+            if moves_data[move_key].get("isNonstandard") is None or 'CAP' not in moves_data[move_key]["isNonstandard"] and 'LGPE' not in moves_data[move_key]["isNonstandard"] and 'Custom' not in moves_data[move_key]["isNonstandard"]:
+                #Create the move
+                with self.driver.session(database="pokedb") as session :
+                    move_tmp = Move(move_key, moves_data[move_key])
+                    #Create the node
+                    session.execute_write(dbu.query_create_move, move_tmp)
+                    #Add a link between the node and the type of the move 
+                    session.execute_write(dbu.query_link_move_to_type, move_key, moves_data[move_key]["type"])
+
+    def load_abilities_data_in_db(self, abilities_data) :
+        '''
+        Load the abilities data into the database
+        param abilities_data: abilities data to be loaded
+        '''
+        with self.driver.session(database="pokedb") as session :
+            for ability_key in list(abilities_data.keys()):
+                #Create the ability
+                if abilities_data[ability_key].get("isNonstandard") is None or 'CAP' not in abilities_data[ability_key]["isNonstandard"] and 'LGPE' not in abilities_data[ability_key]["isNonstandard"] and 'Custom' not in abilities_data[ability_key]["isNonstandard"]:
+                    session.execute_write(dbu.query_create_ability, ability_key, abilities_data[ability_key]["name"], abilities_data[ability_key]["num"], abilities_data[ability_key]["rating"])
+                    print("added", ability_key)
+    
+    def load_moves_pkm_in_db(self, pokemon_data, name_pkm, tier) : 
+        """
+        Load the moves of a pokemon in the database 
+        param pokemon: pokemon to be loaded
+        """
+        with self.driver.session(database="pokedb") as session :
+            #for every move of the pokemon
+            for move in pokemon_data["Moves"].keys():
+                #Create the link between the pokemon and the move
+                session.execute_write(dbu.query_link_poke_to_move, name_pkm, move, tier, pokemon_data["Moves"][move])
+
     def load_types_data_in_db(self, useful_data):
         """
         Load the types data into the database
@@ -55,6 +112,17 @@ class DataBaseHandler:
                 #Create the type
                 session.run("CREATE (t:Type {name: $name, color: $color})", name=type_key, color=types_data[type_key]["color"])
                 print("added", type_key)
+    
+    def load_items_data_in_db(self, items_data) :
+        '''
+        Load the items data into the database
+        param items_data: items data to be loaded
+        '''
+        with self.driver.session(database="pokedb") as session :
+            for item_key in list(items_data.keys()):
+                #Create the item
+                session.execute_write(dbu.query_create_item, item_key, items_data[item_key]["name"], items_data[item_key]["spritenum"], items_data[item_key]["num"])
+                print("added", item_key)
 
     def link_pkm_with_types_and_evo(self, pokedex_data):
         '''
@@ -65,51 +133,101 @@ class DataBaseHandler:
             #add constraint to avoid duplicates
             
             #for every pokemon in pkdex data 
-            for pkm_key in list(json_data.keys()):
+            for pkm_key in list(pokedex_data.keys()):
                 #Check the isNonStandard field to see if it is a real pokemon
                 if pokedex_data[pkm_key].get("isNonstandard") is None or 'CAP' not in pokedex_data[pkm_key]["isNonstandard"] and 'LGPE' not in pokedex_data[pkm_key]["isNonstandard"] and 'Custom' not in pokedex_data[pkm_key]["isNonstandard"]:
                     #Add link to types
                     for type_name in pokedex_data[pkm_key]["types"]:
-                        session.execute_write(link_types_pokemon, pkm_key, type_name)
+                        session.execute_write(dbu.query_link_types_pokemon, pkm_key, type_name)
                     #Add link to evolution
                     if pokedex_data[pkm_key].get("evos") is not None:
-                            session.execute_write(link_evolution, pkm_key, pokedex_data[pkm_key]["evos"][0])
+                            session.execute_write(dbu.query_link_evolution, pkm_key, pokedex_data[pkm_key]["evos"][0])
                     print("added", pkm_key, "number :", pokedex_data[pkm_key]["num"])
-    
-    def add_tier_data(self, tier_data, tier_name):
-        '''
-        Add the tier data to the database
-        param tier_data: tier data to be loaded
-        param tier_name: name of the tier
-        '''
-        tier_data = tier_data["data"]
-        with self.driver.session(database="pokedb") as session :
-            for pkm_key in list(tier_data.keys()):
-                #Link to tier
-                session.execute_write(link_to_tier, pkm_key.lower(), tier_name)
-                #Add link to teammates
-                for mate_key in tier_data[pkm_key]["Teammates"]:
-                    session.execute_write(link_mates_pkms, pkm_key.lower(), mate_key.lower(), tier_data[pkm_key]["Teammates"][mate_key], tier_name)
     
     def add_tier_data_fast(self, tier_data, tier_name) :
         '''
         Add the tier data to the database
-        param tier_data: tier data to be loaded
-        param tier_name: name of the tier
+        @param tier_data: tier data to be loaded
+        @param tier_name: name of the tier
         '''
         tier_data = tier_data["data"]
         with self.driver.session(database="pokedb") as session :
             with session.begin_transaction() as tx:
                 for pkm_key in list(tier_data.keys()):
                     #Link to tier
-                    #tx.run(link_to_tier, pkm_key.lower(), tier_name)
-                    link_to_tier(tx, pkm_key.lower(), tier_name)
-                    #tx.run("MATCH (p:Pokemon {name: $pkm_name}), (t:Tier {name: $tier_name}) CREATE (p)-[r:IN_TIER]->(t)", pkm_name=pkm_key.lower(), tier_name=tier_name)
+                    dbu.query_link_to_tier(tx, pkm_key.lower(), tier_name)
                     #Add link to teammates
                     for mate_key in tier_data[pkm_key]["Teammates"]:
-                        #tx.run(link_mates_pkms, pkm_key.lower(), mate_key.lower(), tier_data[pkm_key]["Teammates"][mate_key], tier_name)
-                        link_mates_pkms(tx, pkm_key.lower(), mate_key.lower(), tier_data[pkm_key]["Teammates"][mate_key], tier_name)
-                        #tx.run("MATCH (p1:Pokemon {name: $pkm1}),(p2:Pokemon {name: $pkm2}) CREATE (p1)-[r:LINK {value: $link_value, name: $tier_name}]->(p2)", pkm1=pkm_key.lower(), pkm2=mate_key.lower(), link_value=tier_data[pkm_key]["Teammates"][mate_key], tier_name=tier_name)
+                        if self.check_if_link_exists(remove_non_letters(pkm_key.lower()), remove_non_letters(mate_key.lower()), "LINK") :
+                            dbu.query_set_value_link_mates(tx, remove_non_letters(pkm_key.lower()), remove_non_letters(mate_key.lower()), tier_name, tier_data[pkm_key]["Teammates"][mate_key])
+                        else : 
+                            dbu.query_create_link_mates(tx,  remove_non_letters(pkm_key.lower()), remove_non_letters(mate_key.lower()), tier_name, tier_data[pkm_key]["Teammates"][mate_key])
+                    
+                    #Add link to moves
+                    for move_key in tier_data[pkm_key]["Moves"]:
+                        if self.check_if_link_exists(remove_non_letters(pkm_key.lower()), remove_non_letters(move_key.lower()), "KNOWS") :
+                            dbu.query_link_pkm_to_move(tx, move_key.lower(), tier_data[pkm_key]["Moves"][move_key], pkm_key.lower(), tier_name)
+                        else : 
+                            pass
+                            
+                    #Add link to abilities
+                    for ability_key in tier_data[pkm_key]["Abilities"]:
+                        dbu.query_link_pkm_to_ability(tx, ability_key.lower(), pkm_key.lower(),tier_data[pkm_key]["Abilities"][ability_key], tier_name)
+                    #Add link to items 
+                    for item_key in tier_data[pkm_key]["Items"]:
+                        dbu.query_link_pkm_to_item(tx, item_key.lower(), pkm_key.lower(), tier_data[pkm_key]["Items"][item_key], tier_name)
+                    print("added", pkm_key)
+
+    def add_tier_data_godspeed(self, tier_data, tier_name) :
+        '''
+        Add the tier data to the database
+        @param tier_data: tier data to be loaded
+        @param tier_name: name of the tier
+        '''
+        tier_data = tier_data["data"]
+        with self.driver.session(database="pokedb") as session :
+            with session.begin_transaction() as tx:
+                for pkm_key in list(tier_data.keys()):
+                    #Clean the key
+                    clean_pkm_key = remove_non_letters(pkm_key.lower())
+
+                    #Link to tier
+                    dbu.query_link_to_tier(tx,clean_pkm_key, tier_name)
+
+                    #Add tier infos on pokemon mates
+                    for mate_key in tier_data[pkm_key]["Teammates"]:
+                        clean_mate_key = remove_non_letters(mate_key.lower())
+                        if self.check_if_link_exists("Pokemon", "Pokemon",clean_pkm_key, clean_mate_key, "LINK") :
+                            dbu.query_set_value_link_nodes(tx, "LINK", "Pokemon", "Pokemon", clean_pkm_key, clean_mate_key, tier_name, tier_data[pkm_key]["Teammates"][mate_key])
+                        else : 
+                           dbu.query_create_value_link_nodes(tx, "LINK", "Pokemon", "Pokemon", clean_pkm_key, clean_mate_key, tier_name, tier_data[pkm_key]["Teammates"][mate_key])
+                    
+                    #Add link to moves
+                    for move_key in tier_data[pkm_key]["Moves"]:
+                        clean_move_key = remove_non_letters(move_key.lower())
+                        if self.check_if_link_exists("Pokemon", "Move", clean_pkm_key, clean_move_key, "KNOWS") :
+                            dbu.query_set_value_link_nodes(tx, "KNOWS", "Pokemon", "Move", clean_pkm_key, clean_move_key, tier_name, tier_data[pkm_key]["Moves"][move_key])
+                        else : 
+                            dbu.query_set_value_link_nodes(tx, "KNOWS", "Pokemon", "Move", clean_pkm_key, clean_move_key, tier_name, tier_data[pkm_key]["Moves"][move_key])
+                    
+                    #Add link to abilities
+                    for ability_key in tier_data[pkm_key]["Abilities"]:
+                        clean_ability_key = remove_non_letters(ability_key.lower())
+                        if self.check_if_link_exists("Pokemon", "Ability", clean_pkm_key, clean_ability_key, "HAS") :
+                            dbu.query_set_value_link_nodes(tx, "HAS", "Pokemon", "Ability", clean_pkm_key, clean_ability_key, tier_name, tier_data[pkm_key]["Abilities"][ability_key])
+                        else :
+                            dbu.query_create_value_link_nodes(tx, "HAS", "Pokemon", "Ability", clean_pkm_key, clean_ability_key, tier_name, tier_data[pkm_key]["Abilities"][ability_key])
+                        
+                    #Add link to items 
+                    for item_key in tier_data[pkm_key]["Items"]:
+                        clean_item_key = remove_non_letters(item_key.lower())
+                        if self.check_if_link_exists("Pokemon", "Item", clean_pkm_key, clean_item_key, "USES") :
+                            dbu.query_set_value_link_nodes(tx, "USES", "Pokemon", "Item", clean_pkm_key, clean_item_key, tier_name, tier_data[pkm_key]["Items"][item_key])
+                        else :
+                            dbu.query_create_value_link_nodes(tx, "USES", "Pokemon", "Item", clean_pkm_key, clean_item_key, tier_name, tier_data[pkm_key]["Items"][item_key])
+                    
+                    print("added", pkm_key)
+
 
     def find_pkms_linked_to(self, pkm_name, tier_name, nb_pkms=20):
         '''
@@ -161,78 +279,36 @@ class DataBaseHandler:
                 return True
             else :
                 return False
-
-#Static functions for the database -----------------------------------
-def create_tier(tx, name) :
-    '''
-    Creates a tier node
-    param tx: transaction
-    param name: name of the tier
-    '''
-    tx.run("CREATE (t:Tier {name: $name})", name=name)
-
-def create_pokemon(tx, name, num, stats, heightm, weightkg):
-    '''
-    Creates a pokemon node
-    param tx: transaction
-    param name: name of the pokemon
-    param num: pokedex number of the pokemon
-    param stats: stats of the pokemon
-    param heightm: height of the pokemon in meters
-    param weightkg: weight of the pokemon in kilograms
-    '''
-    tx.run("CREATE (p:Pokemon {name: $name, num: $num, st_hp: $st_hp, st_atk: $st_atk, st_def: $st_def, st_spa: $st_spa, st_spd: $st_spd, st_spe: $st_spe, heightm: $heightm, weightkg: $weightkg})", name=name, num=num, st_hp=stats['hp'], st_atk=stats['atk'], st_def=stats['def'], st_spa=stats['spa'], st_spd=stats['spd'], st_spe=stats['spe'], heightm=heightm, weightkg=weightkg)
-
-def link_to_tier(tx, pkm_name, tier_name):
-    '''
-    Links a pokemon to a tier
-    param tx: transaction
-    param pkm_name: name of the pokemon
-    param tier_name: name of the tier
-    '''
-    #Create the link between the pokemon and the tier
-    tx.run("MATCH (p:Pokemon {name: $pkm_name}), (t:Tier {name: $tier_name}) CREATE (p)-[r:IN_TIER]->(t)", pkm_name=pkm_name, tier_name=tier_name)
-def link_mates_pkms(tx, pkm1, pkm2, link_value, tier_name):
-    '''
-    Links two pokemon nodes
-    param tx: transaction
-    param pkm1: name of the first pokemon
-    param pkm2: name of the second pokemon
-    param link_value: value of the link
-    param tier_name: name of the tier
-    '''
-    #Link the two pokemon and assign value to the link and set name according to tier name
-    tx.run("MATCH (p1:Pokemon {name: $pkm1}),(p2:Pokemon {name: $pkm2}) CREATE (p1)-[r:LINK {value: $link_value, name: $tier_name}]->(p2)", pkm1=pkm1, pkm2=pkm2, link_value=link_value, tier_name=tier_name)
-
-def link_types_pokemon(tx, pkm_name, type_name):
-    '''
-    Links a pokemon to a type
-    param tx: transaction
-    param pkm_name: name of the pokemon
-    param type_name: name of the type
-    '''
-    tx.run("MATCH (p:Pokemon {name: $pkm_name}), (t:Type {name: $type_name}) CREATE (p)-[:IS_OF_TYPE]->(t)", pkm_name=pkm_name, type_name=type_name)
-
-def link_evolution(tx, pkm_name, evo_name):
-    '''
-    Links a pokemon to its evolution
-    param tx: transaction
-    param pkm_name: name of the pokemon
-    param evo_name: name of the evolution
-    '''
-    tx.run("MATCH (p:Pokemon {name: $pkm_name}), (e:Pokemon {name: $evo_name}) CREATE (p)-[:EVOLVES_TO]->(e)", pkm_name=pkm_name, evo_name=evo_name)
-
-def load_json(file_path: str) -> dict:
-    """
-    Loads a json file and returns it as a dict
-    """
-    #Load json utf-8
-
-
-    with open(file_path, "r", encoding='utf-8') as f:
-        data = json.load(f)
-    return data
-
+    
+    def check_if_link_exists(self, type_node1, type_node2, name_node1, name_node2, link_type):
+        '''
+        Check if a link exists
+        '''
+        # Execute the Cypher query
+        with self.driver.session(database="pokedb") as session:
+            result = session.run(f"MATCH (a:{type_node1})-[r:{link_type}]->(b:{type_node2}) WHERE a.name = '{name_node1}' AND b.name = '{name_node2}' RETURN r")
+            # Check if the query returned a record
+            if result.single() :
+                return True
+            else :
+                return False
+    def find_next_best_mate(self, team) :
+        '''
+        Finds the next best pokemon to add to a team
+        param team: list of pokemon names
+        '''
+        with self.driver.session(database="pokedb") as session :
+            result = session.run(
+            "MATCH (p:Pokemon)-[r:LINK]->(m:Pokemon) "
+            "WHERE p.name IN $team AND r.name = 'GEN8OU' AND NOT m.name IN $team "
+            "WITH m, sum(r.value) as totalMateValue "
+            "ORDER BY totalMateValue DESC "
+            "LIMIT 1 "
+            "RETURN m.name as nextBestMate",
+            team=team
+        )
+            return result.single().value('nextBestMate')
+    
 def get_pokemon_names_in_format(format_name: str) -> list:
     """
     Returns a list of all pokemon names in a given format
@@ -270,7 +346,8 @@ def update_db():
     start_time = time.time()
     db_handler = DataBaseHandler()
     #Remove links mate data 
-    db_handler.clear_mates_links()
+    db_handler.clear_current_tiers_links()
+
     #Load every tiers .json files tracked 
     files_tracked = load_json(r"D:\ProjetsPersos\PokeTeamBuilder\backend\app\static\Json\settings.json")
 
@@ -278,16 +355,51 @@ def update_db():
         if db_handler.check_if_node_exists("Tier", "name", tier) == False:
             #Create the tier node
             with db_handler.driver.session() as session:
-                session.write_transaction(create_tier, tier)
+                session.write_transaction(dbu.create_tier, tier)
         #Add data to db 
         file_name = files_tracked["tiersTracked"][tier]["fileNameShowdown"]
-        tier_data = load_json_url("https://www.smogon.com/stats/2022-11/chaos/{}".format(file_name))
-        db_handler.add_tier_data_fast(tier_data=tier_data, tier_name=tier)
+        tier_data = load_json_url("https://www.smogon.com/stats/2022-12/chaos/{}".format(file_name))
+        db_handler.add_tier_data_godspeed(tier_data=tier_data, tier_name=tier)
         print("Done for {}".format(tier))
+
+    #Now that tiers are loaded in the db, we can look at some stats for the tiers : 
+    
+
     print("Time taken : {}".format(time.time() - start_time))
     print("Done")
+    
+
+def test_db(): 
+    db_handler = DataBaseHandler()
+    with db_handler.driver.session(database="pokedb") as session:
+        pkm1 = "pikachu"
+        pkm2 = "charmander"
+        prop = "GEN9RU"
+        value = 0.9
+        #Run a query to create link between two pokemons (pikachu and charmander) using the mate link type  using dbu
+        session.execute_write(dbu.query_create_link_mates, pkm1, pkm2, prop, value)
+        session.execute_write(dbu.query_set_value_link_mates, pkm1, pkm2, "GEN5PU", 0.6)
 
 
+'''
+MATCH (p:Pokemon)-[r:IS_MATE]->(m:Pokemon)
+WHERE p.name IN ["Pikachu", "Charmander"]
+WITH p, m, r.value as mateValue
+ORDER BY mateValue DESC
+LIMIT 1
+RETURN m.name as nextBestMate
+'''
+
+
+
+'''
+MATCH (p:Pokemon)-[r:LINK]->(m:Pokemon)
+WHERE p.name IN ["pelipper","ferrothorn", "zapdos", "crawdaunt", "seismitoad"]  AND r.name = "GEN8OU" AND NOT m.name IN ["pelipper","ferrothorn", "zapdos", "crawdaunt", "seismitoad"] 
+WITH m, sum(r.value) as totalMateValue
+ORDER BY totalMateValue DESC
+LIMIT 10
+RETURN m.name as nextBestMates , totalMateValue
+'''
 
 if __name__ == "__main__" :
     '''

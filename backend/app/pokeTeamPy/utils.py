@@ -1,13 +1,15 @@
+import json
+import re
+
+
 def load_json(file_path: str) -> dict:
     """
     Loads a json file and returns it as a dict
     """
-    with open(file_path, "r") as f:
+    #Load json utf-8
+    with open(file_path, "r", encoding='utf-8') as f:
         data = json.load(f)
-
     return data
-
-
 
 def get_pokemon_names_in_format(format_name: str) -> list:
     """
@@ -25,3 +27,6 @@ def is_pkm_in_format(pkm_name: str, format_name: str) -> bool:
     """
     return pkm_name in get_pokemon_names_in_format(format_name)
 
+
+def remove_non_letters(string):
+    return re.sub(r'[^a-zA-Z0-9]', '', string)

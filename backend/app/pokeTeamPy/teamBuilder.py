@@ -1,4 +1,4 @@
-from .teamMember import TeamMember
+from .teamElements import TeamMember
 import random 
 
 class TeamBuilder:
