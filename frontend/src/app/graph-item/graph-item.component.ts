@@ -45,6 +45,7 @@ export class GraphItemComponent implements OnInit {
         });
     
         // Clear the interval
+        
         clearInterval(checkForElement);
       }
     }, 10);

@@ -1,4 +1,4 @@
 
-<div class="chart-items-container">
-    <app-graph-item *ngFor="let chartInfos of chartList; let i = index" [graphInfos]="chartInfos" [index]="i"></app-graph-item>
+<div class="chart-items-container" @charts>
+    <app-graph-item *ngFor="let chartInfos of chartList; let i = index" @chartAnim [graphInfos]="chartInfos" [index]="i"></app-graph-item>
 </div>

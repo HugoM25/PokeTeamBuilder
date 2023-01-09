@@ -24,3 +24,26 @@
     margin-bottom: 2%;
 }
 
+
+.button-header {
+    //Create button 
+    //Make them go over the header
+    position: relative;
+    z-index: 1;
+    //Make them look like buttons
+    background-color: #ff3838;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-top: solid;
+    border-left: solid;
+    border-right: solid;
+    border-radius: 16px;
+
+    //Add shadow
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
+    
+}
