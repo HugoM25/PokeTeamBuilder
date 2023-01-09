@@ -3,7 +3,7 @@ import json
 from urllib.request import urlopen
 from . import dataBaseUtils as dbu
 from .utils import load_json, remove_non_letters, clean_names
-from .teamElements import Move
+from .teamElements import MoveDb
 import time
 
 class DataBaseHandler:
@@ -73,7 +73,7 @@ class DataBaseHandler:
             if moves_data[move_key].get("isNonstandard") is None or 'CAP' not in moves_data[move_key]["isNonstandard"] and 'LGPE' not in moves_data[move_key]["isNonstandard"] and 'Custom' not in moves_data[move_key]["isNonstandard"]:
                 #Create the move
                 with self.driver.session(database="pokedb") as session :
-                    move_tmp = Move(move_key, moves_data[move_key])
+                    move_tmp = MoveDb(move_key, moves_data[move_key])
                     #Create the node
                     session.execute_write(dbu.query_create_move, move_tmp)
                     #Add a link between the node and the type of the move 
@@ -221,6 +221,22 @@ class DataBaseHandler:
                     
         print("Time for tier : ", tier_name, " is : ", time.time() - time_st)
 
+    def get_thing_for_pkm(self, pkm_name, thing_type, relation_type, tier, nb_thing=20) :
+        '''
+        Get the items for the given pokemon
+        @param pkm_name: name of the pokemon
+        '''
+        with self.driver.session(database="pokedb") as session :
+            values = session.run(
+            f"""
+            MATCH (p:Pokemon)-[r:{relation_type}]-(i:{thing_type})
+            WHERE p.name = "{pkm_name}" AND r.{tier} IS NOT NULL
+            RETURN i ORDER BY r.{tier} DESC
+            LIMIT {nb_thing}
+            """
+            )
+            result = [dict(i) for i in values]
+            return result
 
     def find_pkms_linked_to(self, pkm_name, tier_name, nb_pkms=20):
         '''
@@ -403,47 +419,6 @@ def test_db():
         session.execute_write(dbu.query_create_link_mates, pkm1, pkm2, prop, value)
         session.execute_write(dbu.query_set_value_link_mates, pkm1, pkm2, "GEN5PU", 0.6)
 
-
-'''
-MATCH (p:Pokemon)-[r:IS_MATE]->(m:Pokemon)
-WHERE p.name IN ["Pikachu", "Charmander"]
-WITH p, m, r.value as mateValue
-ORDER BY mateValue DESC
-LIMIT 1
-RETURN m.name as nextBestMate
-'''
-
-
-
-'''
-MATCH (p:Pokemon)-[r:LINK]->(m:Pokemon)
-WHERE p.name IN ["pelipper","ferrothorn", "zapdos", "crawdaunt", "seismitoad"]  AND r.name = "GEN8OU" AND NOT m.name IN ["pelipper","ferrothorn", "zapdos", "crawdaunt", "seismitoad"] 
-WITH m, sum(r.value) as totalMateValue
-ORDER BY totalMateValue DESC
-LIMIT 10
-RETURN m.name as nextBestMates , totalMateValue
-'''
-
-'''
-WITH ["pelipper","ferrothorn", "zapdos", "crawdaunt", "seismitoad"] as team
-MATCH (p:Pokemon)-[r:LINK]->(m:Pokemon)
-WHERE p.name IN team AND r.GEN8OU IS NOT NULL AND NOT m.name IN team
-WITH m, sum(r.GEN8OU) as totalMateValue
-ORDER BY totalMateValue DESC
-LIMIT 10
-RETURN m.name as nextBestMates , totalMateValue
-'''
-
-'''
-WITH [0.5,1.3,0.4,0.9] as values, ["pelipper", "charmander", "charizard", "pikachu"] AS names
-UNWIND names AS name
-MATCH (p:Pokemon {name: name})
-WITH p, name, reduce(acc = [], i IN range(0, size(values) - 1) | 
-  acc + CASE WHEN names[i] = name THEN [values[i]] ELSE [] END) AS link_value
-MATCH (m:Move {name: "dragondance"})
-CREATE (p)-[r:KNOWS]->(m)
-SET r.GEN = link_value[0]
-'''
 
 if __name__ == "__main__" :
     '''

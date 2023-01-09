@@ -61,12 +61,10 @@ class TeamBuilder:
     def complete_team(self, method="FAST") :
 
         #Filter the team to get only the locked pokemon
-        print(self.team)
         current_members_names = [] 
         for member in self.team :
             if member.name != "" and member.locked == True :
                 current_members_names.append(member.name)
-        print(current_members_names)
 
         #If the team is empty, add a random pokemon
         if len(current_members_names) < 1 :
@@ -91,10 +89,15 @@ class TeamBuilder:
                     #Find the next best mate
                     next_mates_list = self.db_handler.get_next_best_mates(current_members_names, self.tier, limit=5)
                     rand_next_mate_index = random.randint(0, len(next_mates_list)-1)
+
                     #Add the pkm to the team
                     current_members_names.append(next_mates_list[rand_next_mate_index])
                     self.set_pokemon_at_index(i,TeamMember(name=next_mates_list[rand_next_mate_index], settings=self.settings_data))
-                    print("\nok",self.team[i].image_url)
+        
+        #Compose the set of every pokemon 
+        for i in range(0, self.team_size) :
+            tmp_member = self.team[i]
+            tmp_member.compose_set(self.db_handler, tier_name=self.tier)
 
 
     def get_team(self) -> list:

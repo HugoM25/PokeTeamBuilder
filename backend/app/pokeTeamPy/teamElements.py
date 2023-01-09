@@ -18,7 +18,26 @@ class TeamMember :
         else :
             self.image_url = image_url
         self.locked = locked
+        self.moves = []
+        self.item = ""
+        self.ability = ""
+        self.nature = "Hardy"
+
+    def compose_set(self, db_handler, tier_name) :
+       #Set the item 
+       self.item = db_handler.get_thing_for_pkm(self.name, "Item","USES",tier_name, 1)[0]["i"]
+
+       #Set the ability
+       self.ability = db_handler.get_thing_for_pkm(self.name, "Ability","HAS",tier_name, 1)[0]["i"]
+       
+       #Set the moves
+       moves_list = db_handler.get_thing_for_pkm(self.name, "Move","KNOWS",tier_name, 4)
+       for i in range(0,4) :
+            self.moves.append(Move(moves_list[i]["i"]["name"], moves_list[i]["i"]))
     
+
+
+
     def get_data(self):
         return {
             "name" : self.name,
@@ -26,11 +45,42 @@ class TeamMember :
             "isLocked" : self.locked
         }
 
+    def get_showdown_format(self):
+        pkm_showdown_format = f"""
+        {self.name} @ {self.item["name"]}  
+        Ability: {self.ability["name"]}
+        EVs: 252 HP / 252 Atk / 4 SpD  
+        {self.nature} Nature
+        - {self.moves[0].name}  
+        - {self.moves[1].name}   
+        - {self.moves[2].name}    
+        - {self.moves[3].name} 
+        """
+        return pkm_showdown_format
+
+
     def __repr__(self) -> str:
         return self.name + str(self.locked)
     
 
+
 class Move :
+    def __init__(self, move_name="", dict_object=None): 
+        if dict_object is not None:
+            self.name = move_name
+            self.category = dict_object["category"]
+            self.accuracy = int(dict_object["accuracy"])
+            self.base_power = int(dict_object["power"])
+            self.pp = int(dict_object["pp"]) 
+        else :
+            self.name =move_name
+            self.type = ""
+            self.category = ""
+            self.accuracy = 0
+            self.base_power = 0
+            self.pp = 0
+
+class MoveDb :
     def __init__(self, move_name="", json_object=None): 
         if json_object is not None:
             self.name = move_name
@@ -40,7 +90,7 @@ class Move :
             self.base_power = int(json_object["basePower"])
             self.pp = int(json_object["pp"]) 
         else :
-            self.name =""
+            self.name =move_name
             self.type = ""
             self.category = ""
             self.accuracy = 0
