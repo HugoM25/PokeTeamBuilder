@@ -258,6 +258,6 @@ def query_set_list_node(tx, main_node_name, list_nodes_names, list_link_values, 
                WITH p, name, reduce(acc = [], i IN range(0, size(values) - 1) | 
                acc + CASE WHEN names[i] = name THEN [values[i]] ELSE [] END) AS link_value
                MATCH (m:{main_node_type} {{name: "{main_node_name}"}})
-               CREATE (p)-[r:{link_type}]->(m)
+               MERGE (p)-[r:{link_type}]->(m)
                SET r.{tier} = link_value[0]"""
     tx.run(query)

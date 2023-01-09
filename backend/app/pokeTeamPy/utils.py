@@ -30,3 +30,7 @@ def is_pkm_in_format(pkm_name: str, format_name: str) -> bool:
 
 def remove_non_letters(string):
     return re.sub(r'[^a-zA-Z0-9]', '', string)
+
+
+def clean_names(name) : 
+    return remove_non_letters(name).lower()

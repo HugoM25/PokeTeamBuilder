@@ -2,8 +2,9 @@ from neo4j import GraphDatabase
 import json 
 from urllib.request import urlopen
 import dataBaseUtils as dbu
-from utils import load_json, remove_non_letters
+from utils import load_json, remove_non_letters, clean_names
 from teamElements import Move
+import time
 
 class DataBaseHandler:
     def __init__(self):
@@ -185,6 +186,7 @@ class DataBaseHandler:
         @param tier_name: name of the tier
         '''
         tier_data = tier_data["data"]
+        time_st = time.time()
         with self.driver.session(database="pokedb") as session :
             with session.begin_transaction() as tx:
                 for pkm_key in list(tier_data.keys()):
@@ -194,56 +196,30 @@ class DataBaseHandler:
                     #Link to tier
                     dbu.query_link_to_tier(tx,clean_pkm_key, tier_name)
 
-                    #Add tier infos on pokemon mates
-                    import time
+                    #Add tier infos on pokemon mates                  
+                    list_mates_clean = [clean_names(mate_key) for mate_key in tier_data[pkm_key]["Teammates"].keys()]
+                    list_mates_values = list(tier_data[pkm_key]["Teammates"].values())
+                    dbu.query_set_list_node(tx, clean_pkm_key, list_mates_clean, list_mates_values, "LINK", "Pokemon", "Pokemon", tier_name)
 
-                    time_st = time.time()
+                    #Add tier infos on pokemon moves                 
+                    list_moves_clean = [clean_names(move_key) for move_key in tier_data[pkm_key]["Moves"].keys()]
+                    list_moves_values = list(tier_data[pkm_key]["Moves"].values())
+                    dbu.query_set_list_node(tx, clean_pkm_key, list_moves_clean, list_moves_values, "KNOWS", "Move","Pokemon", tier_name)
 
-                    for mate_key in tier_data[pkm_key]["Teammates"]:
-                        clean_mate_key = remove_non_letters(mate_key.lower())
-                        if self.check_if_link_exists("Pokemon", "Pokemon",clean_pkm_key, clean_mate_key, "LINK") :
-                            dbu.query_set_value_link_nodes(tx, "LINK", "Pokemon", "Pokemon", clean_pkm_key, clean_mate_key, tier_name, tier_data[pkm_key]["Teammates"][mate_key])
-                        else : 
-                           dbu.query_create_value_link_nodes(tx, "LINK", "Pokemon", "Pokemon", clean_pkm_key, clean_mate_key, tier_name, tier_data[pkm_key]["Teammates"][mate_key])
-                    
-                    print("Time for mates v1", time.time() - time_st)
+                    #Add tier infos on pokemon abilities               
+                    list_abilities_clean = [clean_names(ability_key) for ability_key in tier_data[pkm_key]["Abilities"].keys()]
+                    list_abilities_values = list(tier_data[pkm_key]["Abilities"].values())
+                    dbu.query_set_list_node(tx, clean_pkm_key, list_abilities_clean, list_abilities_values, "HAS", "Ability","Pokemon", tier_name)
 
-                    time_st = time.time()
 
-                    list_mates_clean = [remove_non_letters(mate_key) for mate_key in tier_data[pkm_key]["Teammates"].keys()]
-                    list_values = list(tier_data[pkm_key]["Teammates"].values())
-                    dbu.query_set_list_node(tx, pkm_key, list_mates_clean, list_values, "LINK", "Pokemon", "Pokemon", tier_name)
-                    
+                    #Add tier infos on pokemon items
+                    list_items_clean = [clean_names(item_key) for item_key in tier_data[pkm_key]["Items"].keys()]
+                    list_items_values = list(tier_data[pkm_key]["Items"].values())
+                    dbu.query_set_list_node(tx, clean_pkm_key, list_items_clean, list_items_values, "USES", "Item","Pokemon", tier_name)
 
-                    print("Time for mates v2", time.time() - time_st)
-
-                    
-
-                    #Add link to moves
-                    for move_key in tier_data[pkm_key]["Moves"]:
-                        clean_move_key = remove_non_letters(move_key.lower())
-                        if self.check_if_link_exists("Pokemon", "Move", clean_pkm_key, clean_move_key, "KNOWS") :
-                            dbu.query_set_value_link_nodes(tx, "KNOWS", "Pokemon", "Move", clean_pkm_key, clean_move_key, tier_name, tier_data[pkm_key]["Moves"][move_key])
-                        else : 
-                            dbu.query_set_value_link_nodes(tx, "KNOWS", "Pokemon", "Move", clean_pkm_key, clean_move_key, tier_name, tier_data[pkm_key]["Moves"][move_key])
-                    
-                    #Add link to abilities
-                    for ability_key in tier_data[pkm_key]["Abilities"]:
-                        clean_ability_key = remove_non_letters(ability_key.lower())
-                        if self.check_if_link_exists("Pokemon", "Ability", clean_pkm_key, clean_ability_key, "HAS") :
-                            dbu.query_set_value_link_nodes(tx, "HAS", "Pokemon", "Ability", clean_pkm_key, clean_ability_key, tier_name, tier_data[pkm_key]["Abilities"][ability_key])
-                        else :
-                            dbu.query_create_value_link_nodes(tx, "HAS", "Pokemon", "Ability", clean_pkm_key, clean_ability_key, tier_name, tier_data[pkm_key]["Abilities"][ability_key])
-                        
-                    #Add link to items 
-                    for item_key in tier_data[pkm_key]["Items"]:
-                        clean_item_key = remove_non_letters(item_key.lower())
-                        if self.check_if_link_exists("Pokemon", "Item", clean_pkm_key, clean_item_key, "USES") :
-                            dbu.query_set_value_link_nodes(tx, "USES", "Pokemon", "Item", clean_pkm_key, clean_item_key, tier_name, tier_data[pkm_key]["Items"][item_key])
-                        else :
-                            dbu.query_create_value_link_nodes(tx, "USES", "Pokemon", "Item", clean_pkm_key, clean_item_key, tier_name, tier_data[pkm_key]["Items"][item_key])
-                    
                     print("added", pkm_key)
+                    
+        print("Time for tier : ", tier_name, " is : ", time.time() - time_st)
 
 
     def find_pkms_linked_to(self, pkm_name, tier_name, nb_pkms=20):
@@ -418,6 +394,15 @@ LIMIT 10
 RETURN m.name as nextBestMates , totalMateValue
 '''
 
+'''
+WITH ["pelipper","ferrothorn", "zapdos", "crawdaunt", "seismitoad"] as team
+MATCH (p:Pokemon)-[r:LINK]->(m:Pokemon)
+WHERE p.name IN team AND r.GEN8OU IS NOT NULL AND NOT m.name IN team
+WITH m, sum(r.GEN8OU) as totalMateValue
+ORDER BY totalMateValue DESC
+LIMIT 10
+RETURN m.name as nextBestMates , totalMateValue
+'''
 
 '''
 WITH [0.5,1.3,0.4,0.9] as values, ["pelipper", "charmander", "charizard", "pikachu"] AS names
