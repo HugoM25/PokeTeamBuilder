@@ -1,9 +1,9 @@
 from neo4j import GraphDatabase 
 import json 
 from urllib.request import urlopen
-import dataBaseUtils as dbu
-from utils import load_json, remove_non_letters, clean_names
-from teamElements import Move
+from . import dataBaseUtils as dbu
+from .utils import load_json, remove_non_letters, clean_names
+from .teamElements import Move
 import time
 
 class DataBaseHandler:
@@ -301,6 +301,36 @@ class DataBaseHandler:
             team=team
         )
             return result.single().value('nextBestMate')
+
+    def get_next_best_mate(self, pkm_team, tier_name) :
+        with self.driver.session(database="pokedb") as session : 
+            result = session.run(
+                f"""
+                WITH {pkm_team} as team
+                MATCH (p:Pokemon)-[r:LINK]->(m:Pokemon)
+                WHERE p.name IN team AND r.{tier_name} IS NOT NULL AND NOT m.name IN team
+                WITH m, sum(r.{tier_name}) as totalMateValue
+                ORDER BY totalMateValue DESC
+                LIMIT 1
+                RETURN m.name as nextBestMate
+                """
+            )
+            return result.single().value('nextBestMate')
+    
+    def get_next_best_mates(self, pkm_team, tier_name, limit=10) :
+        with self.driver.session(database="pokedb") as session : 
+            result = session.run(
+                f"""
+                WITH {pkm_team} as team
+                MATCH (p:Pokemon)-[r:LINK]->(m:Pokemon)
+                WHERE p.name IN team AND r.{tier_name} IS NOT NULL AND NOT m.name IN team
+                WITH m, sum(r.{tier_name}) as totalMateValue
+                ORDER BY totalMateValue DESC
+                LIMIT {limit}
+                RETURN m.name as nextBestMates
+                """
+            )
+            return list(result.value('nextBestMates'))
     
 def get_pokemon_names_in_format(format_name: str) -> list:
     """

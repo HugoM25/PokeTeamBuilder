@@ -52,5 +52,19 @@
             "name" : "[Gen8] LC",
             "fileNameShowdown": "gen8lc-0.json"
         }
+    },
+    "spritesExceptions" : {
+        "landorustherian" : "landorus-therian",
+        "thundurustherian" : "thundurus-therian",
+        "tornadustherian" : "tornadus-therian",
+        "giratinaorigin" : "giratina-origin",
+        "mimikyubusted" : "mimikyu-busted",
+        "pikachucosplay" : "pikachu-cosplay",
+        "urshifurapidstrike" : "urshifu-rapidstrike",
+        "urshifusinglestrike" : "urshifu",
+        "deoxysattack" : "deoxys-attack",
+        "marowakalola" : "marowak-alola",
+        "zapdosgalar" : "zapdos-galar",
+        
     }
 }

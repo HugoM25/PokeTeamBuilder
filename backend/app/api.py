@@ -92,11 +92,11 @@ def complete_team():
         team_builder = pokeTeamPy.TeamBuilder(curr_team, tier=json_data["tier"], db_handler=db_handler)
 
         #Complete team 
-        team_builder.complete_team(method="SMART")
+        team_builder.complete_team(method="JSP")
 
         #Get the team
         team = team_builder.get_team()
-
+        print([member for member in team])
         response = jsonify(team)
         response.headers.add("Access-Control-Allow-Origin", "*")
         response.headers.add('Set-Cookie','cross-site-cookie=bar; SameSite=None; Secure')

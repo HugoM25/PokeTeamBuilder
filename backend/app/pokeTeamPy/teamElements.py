@@ -1,8 +1,18 @@
 class TeamMember :
-    def __init__(self, name="", image_url="assets/images/default.png", locked=False ):
+    def __init__(self, name="", image_url="assets/images/default.png", locked=False, settings=None):
         self.name = name
         if name != "" :
-            self.image_url = "https://play.pokemonshowdown.com/sprites/ani/" + name + ".gif"
+            #Handle exceptions (names with '-' char)
+            if settings is not None:
+                if name in settings["spritesExceptions"].keys():
+                    print("Exception found")
+                    self.image_url = "https://play.pokemonshowdown.com/sprites/ani/" + settings["spritesExceptions"][name] + ".gif"
+                    print(self.image_url)
+                else : 
+                    self.image_url = "https://play.pokemonshowdown.com/sprites/ani/" + name + ".gif"
+            else :
+                self.image_url = "https://play.pokemonshowdown.com/sprites/ani/" + name + ".gif"
+            
             #Till gen9 gifs are not available use this one
             #self.image_url = "https://play.pokemonshowdown.com/sprites/dex/" + name + ".png"
         else :
