@@ -261,3 +261,18 @@ def query_set_list_node(tx, main_node_name, list_nodes_names, list_link_values, 
                MERGE (p)-[r:{link_type}]->(m)
                SET r.{tier} = link_value[0]"""
     tx.run(query)
+
+def query_set_list_spreads(tx, spreads_dict_item, spreads_dict_values, pokemon_name, tier, link_name="HAS_SPREAD") :
+    #Use a query that will create a node from a map using the keys as properties
+    query = f"""MATCH (m:Pokemon)
+                WHERE m.name="{pokemon_name}"
+                WITH m, [{str(spreads_dict_item)[2:-2].replace('}"', '}').replace('"{', '{')}] as items, {spreads_dict_values} as values
+                UNWIND items as item
+                MERGE (s:Spread {{nature:item["nature"], ev_hp:item["ev_hp"], ev_atk:item["ev_atk"], ev_def:item["ev_def"], 
+                ev_spa:item["ev_spa"], ev_spd:item["ev_spd"], ev_spe:item["ev_spe"]}})
+                WITH s, m, item, reduce(acc = [], i IN range(0, size(values) - 1) | 
+                acc + CASE WHEN items[i] = item THEN [values[i]] ELSE [] END) AS link_value
+                MERGE (s)-[r:{link_name}]->(m)
+                SET r.{tier} = link_value[0]
+            """
+    tx.run(query)

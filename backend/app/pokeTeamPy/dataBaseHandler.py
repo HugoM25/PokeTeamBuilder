@@ -2,7 +2,7 @@ from neo4j import GraphDatabase
 import json 
 from urllib.request import urlopen
 from . import dataBaseUtils as dbu
-from .utils import load_json, remove_non_letters, clean_names
+from .utils import load_json, remove_non_letters, clean_names, spread_to_dict, dict_to_neo4j_style
 from .teamElements import MoveDb
 import time
 
@@ -36,6 +36,8 @@ class DataBaseHandler:
             session.run("MATCH ()-[r:KNOWS]->() DELETE r")
             #Delete the abilities links
             session.run("MATCH ()-[r:HAS]->() DELETE r")
+            #Delete the spreads links and nodes
+            session.run("MATCH (s:Spread) DETACH DELETE s")
 
     def clear_db(self):
         """
@@ -216,6 +218,19 @@ class DataBaseHandler:
                     list_items_clean = [clean_names(item_key) for item_key in tier_data[pkm_key]["Items"].keys()]
                     list_items_values = list(tier_data[pkm_key]["Items"].values())
                     dbu.query_set_list_node(tx, clean_pkm_key, list_items_clean, list_items_values, "USES", "Item","Pokemon", tier_name)
+
+                    #Add tier infos on pokemon spreads
+                    #Unfortunately the longest operation, there is so much data that we only take the first 30 spreads
+                    sorted_spreads = sorted(tier_data[pkm_key]["Spreads"].keys()) 
+                    nb_spreads_to_extract = min(30, len(sorted_spreads))
+
+                    list_spreads_clean = [ spread_to_dict(sorted_spreads[i]) for i in range(nb_spreads_to_extract)]
+                    #Now dict in python are like this { "key": value, "key2": value2, ...} but we want it to be like this {key: value, key2: value2, ...} so we remove the quotes
+                    
+                    list_spreads_clean = [dict_to_neo4j_style(str(list_spreads_clean[i])) for i in range(nb_spreads_to_extract)]
+                    #TO DO remove the number quotes (preventing them from becoming int)
+                    list_spreads_values = [tier_data[pkm_key]["Spreads"][sorted_spreads[i]] for i in range(nb_spreads_to_extract)]
+                    dbu.query_set_list_spreads(tx, list_spreads_clean, list_spreads_values, clean_pkm_key, tier_name,"HAS_SPREAD")
 
                     print("added", pkm_key)
                     
@@ -408,16 +423,7 @@ def update_db():
     print("Done")
     
 
-def test_db(): 
-    db_handler = DataBaseHandler()
-    with db_handler.driver.session(database="pokedb") as session:
-        pkm1 = "pikachu"
-        pkm2 = "charmander"
-        prop = "GEN9RU"
-        value = 0.9
-        #Run a query to create link between two pokemons (pikachu and charmander) using the mate link type  using dbu
-        session.execute_write(dbu.query_create_link_mates, pkm1, pkm2, prop, value)
-        session.execute_write(dbu.query_set_value_link_mates, pkm1, pkm2, "GEN5PU", 0.6)
+
 
 
 if __name__ == "__main__" :

@@ -34,3 +34,21 @@ def remove_non_letters(string):
 
 def clean_names(name) : 
     return remove_non_letters(name).lower()
+
+
+def spread_to_dict(spread_string) :
+    splitted_stats = spread_string.split(':')[1].split('/')
+    spread = {
+        "nature" : spread_string.split(':')[0].lower(),
+        "ev_hp" : splitted_stats[0],
+        "ev_atk" : splitted_stats[1],
+        "ev_def" : splitted_stats[2],
+        "ev_spa" : splitted_stats[3],
+        "ev_spd" : splitted_stats[4],
+        "ev_spe" : splitted_stats[5]
+    }
+    return spread
+
+def dict_to_neo4j_style(spread_string) : 
+    #Transform the 'key': in key:
+    return spread_string.replace("{'", "{").replace("':", ":").replace(", '", ", ")
