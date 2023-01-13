@@ -35,7 +35,6 @@ def get_pkm():
         response = jsonify(pkm.get_data())
         response.headers.add("Access-Control-Allow-Origin", "*")
         response.headers.add('Set-Cookie','cross-site-cookie=bar; SameSite=None; Secure')
-
         return response, 200
 
 @app.route('/get_pkms_in_tier', methods=["POST"])

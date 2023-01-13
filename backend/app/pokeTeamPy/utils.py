@@ -52,3 +52,7 @@ def spread_to_dict(spread_string) :
 def dict_to_neo4j_style(spread_string) : 
     #Transform the 'key': in key:
     return spread_string.replace("{'", "{").replace("':", ":").replace(", '", ", ")
+
+def write_ev_spread(evs_data):
+    #In the format  Evs: 252 Atk / 252 Spe / 4 SpD
+    return evs_data["ev_hp"] + " Hp / " + evs_data["ev_atk"] + " Atk / " + evs_data["ev_def"] + " Def / " + evs_data["ev_spa"] + " SpA / " + evs_data["ev_spd"] + " SpD / " + evs_data["ev_spe"] + " Spe"

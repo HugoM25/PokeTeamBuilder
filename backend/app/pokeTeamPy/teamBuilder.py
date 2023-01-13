@@ -98,6 +98,8 @@ class TeamBuilder:
         for i in range(0, self.team_size) :
             tmp_member = self.team[i]
             tmp_member.compose_set(self.db_handler, tier_name=self.tier)
+            print(tmp_member.get_showdown_format())
+        
 
 
     def get_team(self) -> list:

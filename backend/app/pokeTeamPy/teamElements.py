@@ -1,3 +1,4 @@
+from .utils import write_ev_spread
 class TeamMember :
     def __init__(self, name="", image_url="assets/images/default.png", locked=False, settings=None):
         self.name = name
@@ -22,21 +23,26 @@ class TeamMember :
         self.item = ""
         self.ability = ""
         self.nature = "Hardy"
+        self.spread=""
 
     def compose_set(self, db_handler, tier_name) :
-       #Set the item 
-       self.item = db_handler.get_thing_for_pkm(self.name, "Item","USES",tier_name, 1)[0]["i"]
-
-       #Set the ability
-       self.ability = db_handler.get_thing_for_pkm(self.name, "Ability","HAS",tier_name, 1)[0]["i"]
+        #Set the item 
+        self.item = db_handler.get_thing_for_pkm(self.name, "Item","USES",tier_name, 1)[0]["i"]
+        
+        #Set the ability
+        self.ability = db_handler.get_thing_for_pkm(self.name, "Ability","HAS",tier_name, 1)[0]["i"]
        
-       #Set the moves
-       moves_list = db_handler.get_thing_for_pkm(self.name, "Move","KNOWS",tier_name, 4)
-       for i in range(0,4) :
+        #Set the moves
+        moves_list = db_handler.get_thing_for_pkm(self.name, "Move","KNOWS",tier_name, 4)
+        
+        for i in range(0,4) :
             self.moves.append(Move(moves_list[i]["i"]["name"], moves_list[i]["i"]))
+            
+        #Set the spread
+        spread_infos = db_handler.get_thing_for_pkm(self.name, "Spread","HAS_SPREAD",tier_name, 1)[0]["i"]
+        self.ev_spread = write_ev_spread(spread_infos)
+        self.nature = spread_infos["nature"]
     
-
-
 
     def get_data(self):
         return {
@@ -49,8 +55,8 @@ class TeamMember :
         pkm_showdown_format = f"""
         {self.name} @ {self.item["name"]}  
         Ability: {self.ability["name"]}
-        EVs: 252 HP / 252 Atk / 4 SpD  
-        {self.nature} Nature
+        EVs: {self.ev_spread}  
+        {self.nature.capitalize()} Nature
         - {self.moves[0].name}  
         - {self.moves[1].name}   
         - {self.moves[2].name}    
