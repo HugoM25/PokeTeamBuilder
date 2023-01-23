@@ -38,7 +38,7 @@ This web app allows you to easily generate pokemon teams and view statistics on 
 ## Prerequisites 
 
 In order to make the web app work you will need to have npm installed.
-You will also need python 3.X installed with the libraries listed in the [requirements.txt]() file.
+You will also need python 3.X installed with the libraries listed in the [requirements.txt](https://github.com/HugoM25/PokeTeamBuilder/blob/master/backend/app/requirements.txt) file.
 
 ## Installation 
 
