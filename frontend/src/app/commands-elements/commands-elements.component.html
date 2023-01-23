@@ -5,5 +5,7 @@
     <button class="button" (click)="generateTeam()" [class.spinner]="isLoadingTeam" [disabled]="isLoadingTeam ? true : null">
         <span class="button-text">GENERATE TEAM</span>
     </button>
-    <button class="button">COPY TEAM</button>
+    <button class="button" (click)="copyTeam()">
+        <span class="button-text">COPY TEAM</span>
+    </button>
 </div>

@@ -138,5 +138,16 @@ export class TeamPageComponent implements OnInit {
       this.tiersAvailable = data;
     });
   }
+
+  CopyTeamShowdownFormat(){
+    this.pokeInfosService.getCurrentTeamShowdownFormatted(this.teamList, this.tierActive).pipe(take(1)).subscribe((data:string) => {
+      console.log(data);
+      navigator.clipboard.writeText(data).then(() => {
+        console.log('Content copied to clipboard');
+      },() => {
+        console.error('Failed to copy');
+      });
+    });
+  }
   
 }

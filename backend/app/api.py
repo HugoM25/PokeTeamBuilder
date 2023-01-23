@@ -100,9 +100,29 @@ def complete_team():
 
         return response, 200
     
+@app.route('/get_team_showdown_format', methods=["POST"])
+def get_team_showdown_format():
+    '''
+    Get the team in showdown format
+    '''
+    response = None
+    if request.method == "POST":
+        #Get the data from the request
+        json_data = request.get_json()
 
+        #Create a team builder instance with the current team
+        curr_team = [member for member in json_data["team"]]
+        team_builder = pokeTeamPy.TeamBuilder(curr_team, tier=json_data["tier"], db_handler=db_handler)
 
+        #Get the team
+        team_showdown = team_builder.get_showdown_format()
 
+        #Send the response
+        response = jsonify(team_showdown)
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Set-Cookie','cross-site-cookie=bar; SameSite=None; Secure')
+
+        return response, 200
 
 if __name__ == '__main__':
     db_handler = pokeTeamPy.DataBaseHandler()

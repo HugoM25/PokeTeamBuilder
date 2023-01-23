@@ -109,3 +109,16 @@ class TeamBuilder:
         '''
         team_data = [pkm.get_data() for pkm in self.team]
         return team_data
+
+    def get_showdown_format(self) -> str:
+        '''
+        Get the team in showdown format
+        @return: The team in showdown format
+        '''
+        
+        showdown_format = ""
+        for pkm in self.team :
+            pkm.compose_set(self.db_handler, tier_name=self.tier)
+            showdown_format += pkm.get_showdown_format() + "\n"
+        
+        return showdown_format

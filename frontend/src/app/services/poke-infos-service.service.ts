@@ -45,5 +45,12 @@ export class PokeInfosServiceService {
     return req; 
   }
 
-
+  getCurrentTeamShowdownFormatted(teamPoke:PokeInfos[], tier:string):Observable<string> {
+    const body = {
+      team : teamPoke,
+      tier : tier
+    };
+    const req = this.http.post<string>('http://127.0.0.1:5000/get_team_showdown_format', body);
+    return req; 
+  }
 }

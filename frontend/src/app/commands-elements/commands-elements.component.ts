@@ -11,6 +11,8 @@ export class CommandsElementsComponent implements OnInit {
 
   @Output() onGenerate = new EventEmitter<{tier:string}>();
 
+  @Output() onCopyTeam = new EventEmitter();
+
   @Output() onTierChange = new EventEmitter<{tier:string}>();
 
   @Input() availableTiers!: string[];
@@ -37,6 +39,10 @@ export class CommandsElementsComponent implements OnInit {
     this.onGenerate.emit({
       tier : this.activeTier
     });
+  }
+
+  copyTeam(){
+    this.onCopyTeam.emit();
   }
 
 }
