@@ -18,7 +18,7 @@
 
 # About the Project 
 
-## Context 
+## Context  
 
 This project is a remake of one of my old projects (made in plain javascript and using the python framework flask as backend). In order to improve in full-stack development I decided to remake it using angular as frontend framework.
 
@@ -70,6 +70,8 @@ Clone this repository and follow the [usage](#usage) part in order to launch the
   Open [http://localhost:4200/](http://localhost:4200/) and enjoy the webapp.
 
 # Examples
+
+[WIP] Needs to implement some functionalities before release.
 
 # License 
 
