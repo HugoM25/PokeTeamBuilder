@@ -1,5 +1,7 @@
 <h1 align="center"> Pokemon Team Generator </h1>
 
+<img align="center" width="100%" src="https://github.com/HugoM25/PokeTeamBuilder/blob/master/webapp_example.png" alt="cover" />
+
 <!-- Table of Contents -->
 # Table of Contents
 - [About the Project](#about-the-project)
@@ -18,16 +20,18 @@
 
 ## Context 
 
-This project is a remake of one of my old projects made in plain javascript and using the python framework flask as backend. In order to improve in full-stack development I decided to remake it using angular as frontend framework.
+This project is a remake of one of my old projects (made in plain javascript and using the python framework flask as backend). In order to improve in full-stack development I decided to remake it using angular as frontend framework.
 
 ## Made with 
 
-The fronted has been made using `angular`
-The backend has been made using python `flask` framework and `neo4j` for the database
+The fronted has been made using `angular`.
+The backend has been made using the python `flask` framework and `neo4j` for the database.
 
 ## Features 
 
-This web app allows you to easily generate pokemon teams and view statistics on current tiers. The generated Pokemon teams can be easily exported in the showdown format.
+This web app allows you to easily generate pokemon teams and view statistics on current tiers. The generated Pokemon teams can be easily exported in the showdown format. You can choose and lock some pokemons you really want to play with and the app will generate a team around them.
+
+<img align="center" width="100%" src="https://github.com/HugoM25/PokeTeamBuilder/blob/master/team_poke_generation.gif" alt="generation_team_example_gif" />
 
 # Getting Started
 
@@ -38,11 +42,13 @@ You will also need python 3.X installed with the libraries listed in the [requir
 
 ## Installation 
 
+Clone this repository and follow the [usage](#usage) part in order to launch the app. 
+
 # Usage 
 
   1. Start the database 
   
-  Go to the backend folder and in a terminal execute this command : 
+  Go to the db folder and in a terminal execute this command : 
   ```console
   neo4j/bin/neo4j start 
   ```
