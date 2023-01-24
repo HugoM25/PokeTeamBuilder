@@ -58,6 +58,7 @@ export class PokeDisplayComponent implements OnInit {
     this.setPokeParentComponent();
   }
 
+
   //Change lock infos 
   updateLock(){
     //emit the event to the parent component
@@ -74,5 +75,9 @@ export class PokeDisplayComponent implements OnInit {
       name: this.pokeInfos.name,
       index : this.index
     });
+  }
+
+  fixImage():void{
+    this.pokeInfos.imageUrl = "assets/images/default.png";
   }
 }

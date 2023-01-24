@@ -30,7 +30,7 @@ def get_pkm():
         #Get the pokemon
         pkm = pokeTeamPy.TeamMember(str(json_data["name"]))
 
-        pkm.image_url = "https://play.pokemonshowdown.com/sprites/ani/" + pkm.name + ".gif"
+        pkm.image_url = "https://play.pokemonshowdown.com/sprites/dex/" + pkm.name + ".png"
         #Create the response
         response = jsonify(pkm.get_data())
         response.headers.add("Access-Control-Allow-Origin", "*")

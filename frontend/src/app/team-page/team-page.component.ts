@@ -143,7 +143,7 @@ export class TeamPageComponent implements OnInit {
     this.pokeInfosService.getCurrentTeamShowdownFormatted(this.teamList, this.tierActive).pipe(take(1)).subscribe((data:string) => {
       console.log(data);
       navigator.clipboard.writeText(data).then(() => {
-        console.log('Content copied to clipboard');
+        alert("Team copied to clipboard");
       },() => {
         console.error('Failed to copy');
       });

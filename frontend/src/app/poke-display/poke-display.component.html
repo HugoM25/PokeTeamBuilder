@@ -1,7 +1,7 @@
 <div class="poke-disp-card">
     <img src="assets/images/pokeball.png" class="pokeball-img" alt="pokeball">
     <span class="resizable">
-        <img [src]="pokeInfos.imageUrl" class="poke-img" alt="poke image">
+        <img [src]="pokeInfos.imageUrl" class="poke-img" alt="poke image" (error)="fixImage()">
     </span>
     <button (click)="updateLock()" class="lock-button">
         <img class="lock-icon" src="{{imageLock}}" alt="lock icon">
