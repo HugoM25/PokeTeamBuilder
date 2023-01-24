@@ -124,6 +124,28 @@ def get_team_showdown_format():
 
         return response, 200
 
+@app.route('/get_stats_tier', methods=["POST"])
+def get_stats_tier():
+    """
+    Get the stats of the given tier
+    """
+    response = None
+    if request.method == "POST":
+        #Get the data from the request
+        json_data = request.get_json()
+
+        #Get the pokemon in the given tier
+        stats_infos = db_handler.get_stats_tier(str(json_data["tier"]))
+
+        #Create the response
+        response = jsonify(stats_infos)
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Set-Cookie','cross-site-cookie=bar; SameSite=None; Secure')
+
+        return response, 200
+
+
+
 if __name__ == '__main__':
     db_handler = pokeTeamPy.DataBaseHandler()
     app.run(debug=True)

@@ -4,6 +4,10 @@
             "name" : "[Gen8] OU",
             "fileNameShowdown": "gen8ou-0.json"
         },
+        "GEN8UBERS": {
+            "name" : "[Gen8] UBERS",
+            "fileNameShowdown": "gen8ubers-0.json"
+        },
         "GEN8UU": {
             "name" : "[Gen8] UU",
             "fileNameShowdown": "gen8uu-0.json"
@@ -15,34 +19,6 @@
         "GEN8BDSPOU": {
             "name" : "[BDSP] OU",
             "fileNameShowdown": "gen8bdspou-0.json"
-        },
-        "GEN1OU": {
-            "name" : "[Gen1] OU",
-            "fileNameShowdown": "gen1ou-0.json"
-        },
-        "GEN2OU": {
-            "name" : "[Gen2] OU",
-            "fileNameShowdown": "gen2ou-0.json"
-        },
-        "GEN3OU": {
-            "name" : "[Gen3] OU",
-            "fileNameShowdown": "gen3ou-0.json"
-        },
-        "GEN4OU": {
-            "name" : "[Gen4] OU",
-            "fileNameShowdown": "gen4ou-0.json"
-        },
-        "GEN5OU": {
-            "name" : "[Gen5] OU",
-            "fileNameShowdown": "gen5ou-0.json"
-        },
-        "GEN6OU": {
-            "name" : "[Gen6] OU",
-            "fileNameShowdown": "gen6ou-0.json"
-        },
-        "GEN7OU": {
-            "name" : "[Gen7] OU",
-            "fileNameShowdown": "gen7ou-0.json"
         },
         "GEN9OU":{
             "name" : "[Gen9] OU",

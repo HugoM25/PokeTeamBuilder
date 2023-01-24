@@ -1,5 +1,6 @@
 export class ChartInfos {
-    type !: "pie" | "bar";
+    name !: string;
+    type !: "pie" | "bar" | "radar";
     labels !: string[]; 
     datas !: number[];
     colors !: string[];

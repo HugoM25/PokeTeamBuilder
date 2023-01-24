@@ -2,3 +2,9 @@
 <div class="chart-items-container" @charts>
     <app-graph-item *ngFor="let chartInfos of chartList; let i = index" @chartAnim [graphInfos]="chartInfos" [index]="i"></app-graph-item>
 </div>
+
+<div class="commands-panel">
+    <select class="select-tier"  (change)="setTier($event)" [value]="tierActive">
+        <option *ngFor="let tier of tiersAvailable" [value]="tier" [selected]="tier == tierActive">{{tier}}</option>
+    </select>
+</div>

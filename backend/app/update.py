@@ -14,7 +14,7 @@ def update_db():
         if db_handler.check_if_node_exists("Tier", "name", tier) == False:
             #Create the tier node
             with db_handler.driver.session() as session:
-                session.write_transaction(dbu.create_tier, tier)
+                session.write_transaction(dbu.query_create_tier, tier)
         #Add data to db 
         file_name = files_tracked["tiersTracked"][tier]["fileNameShowdown"]
         tier_data = load_json_url("https://www.smogon.com/stats/2022-12/chaos/{}".format(file_name))

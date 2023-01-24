@@ -6,3 +6,32 @@
     //Space around
     justify-content: space-around;
 }
+
+.commands-panel {
+    //Create a flexbox container
+    display: flex;
+    //Display the items horizontally
+    flex-direction: row;
+    //Space around
+    justify-content: space-around;
+
+    margin-top: 2%;
+}
+
+.select-tier {
+    border: none;
+    justify-content: center;
+    position: relative;
+    width: fit-content;
+
+    /*Center*/
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    text-align: center;
+    font-size: 16px;
+    flex-shrink: 1;
+    z-index: 4;
+}

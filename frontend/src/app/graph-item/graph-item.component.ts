@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Chart } from 'chart.js/auto';
-import { OnInit } from '@angular/core';
+import { OnInit, OnChanges } from '@angular/core';
 import { ChartInfos } from '../models/chart-infos.model';
 
 @Component({
@@ -8,7 +8,7 @@ import { ChartInfos } from '../models/chart-infos.model';
   templateUrl: './graph-item.component.html',
   styleUrls: ['./graph-item.component.scss']
 })
-export class GraphItemComponent implements OnInit {
+export class GraphItemComponent implements OnChanges {
   
   selfChart !: Chart;
   selfName !: string;
@@ -18,7 +18,7 @@ export class GraphItemComponent implements OnInit {
   constructor() { }
 
 
-  ngOnInit() {
+  ngOnChanges() {
 
     //Compose the id of the chart's canvas
     this.selfName = "myChart" + this.index;
@@ -31,18 +31,64 @@ export class GraphItemComponent implements OnInit {
       const chartElement = document.getElementById(this.selfName);
       //When the canvas is created, create the chart
       if (chartElement) {
-        this.selfChart = new Chart(this.selfName, {
-          type: "pie",
-          data: {
-            labels: this.graphInfos.labels,
-            datasets: [
-              {
-                data: this.graphInfos.datas,
-                backgroundColor: this.graphInfos.labels,
+
+
+        if (this.graphInfos.type == "pie"){
+          this.selfChart = new Chart(this.selfName, {
+            type: this.graphInfos.type,
+            data: {
+              labels: this.graphInfos.labels,
+              datasets: [
+                {
+                  data: this.graphInfos.datas,
+                  backgroundColor: this.graphInfos.colors,
+                }
+              ]
+            }
+          });
+        }
+        else if (this.graphInfos.type == "bar"){
+          this.selfChart = new Chart(this.selfName, {
+            type: this.graphInfos.type,
+            data: {
+              labels: this.graphInfos.labels,
+              datasets: [
+                {
+                  data: this.graphInfos.datas,
+                  backgroundColor: this.graphInfos.colors,
+                }
+              ]
+            }
+          });
+        }
+        else if (this.graphInfos.type == "radar"){
+          this.selfChart = new Chart(this.selfName, {
+            type: this.graphInfos.type,
+            data: {
+              labels: this.graphInfos.labels,
+              datasets: [
+                {
+                  data: this.graphInfos.datas,
+                  backgroundColor: this.graphInfos.colors,
+                }
+              ]
+            },
+            options: {
+              maintainAspectRatio: true,
+              scales: {
+                r: {
+                  min: 0,
+                  max: 200,
+                  beginAtZero: true,
+                  angleLines: {
+                    color: "red",
+                 }
+               }
               }
-            ]
-          }
-        });
+            }
+          });
+        }
+
     
         // Clear the interval
         

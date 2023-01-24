@@ -93,15 +93,17 @@ def query_create_pokemon(tx, name, num, stats, heightm, weightkg):
     '''
     tx.run("CREATE (p:Pokemon {name: $name, num: $num, st_hp: $st_hp, st_atk: $st_atk, st_def: $st_def, st_spa: $st_spa, st_spd: $st_spd, st_spe: $st_spe, heightm: $heightm, weightkg: $weightkg})", name=name, num=num, st_hp=stats['hp'], st_atk=stats['atk'], st_def=stats['def'], st_spa=stats['spa'], st_spd=stats['spd'], st_spe=stats['spe'], heightm=heightm, weightkg=weightkg)
 
-def query_link_to_tier(tx, pkm_name, tier_name):
+def query_link_to_tier(tx, pkm_name, tier_name, count):
     '''
     Links a pokemon to a tier
     param tx: transaction
     param pkm_name: name of the pokemon
     param tier_name: name of the tier
+    param count: number of times the pokemon was used in the tier
     '''
     #Create the link between the pokemon and the tier
-    tx.run("MATCH (p:Pokemon {name: $pkm_name}), (t:Tier {name: $tier_name}) CREATE (p)-[r:IN_TIER]->(t)", pkm_name=pkm_name, tier_name=tier_name)
+    query = f"""MATCH (p:Pokemon {{name: "{pkm_name}"}}), (t:Tier {{name: "{tier_name}"}}) CREATE (p)-[r:IN_TIER {{value: {count} }}]->(t)"""
+    tx.run(query)
 
 def query_link_mates_pkms(tx, pkm1, pkm2, link_value, tier_name):
     '''
@@ -276,3 +278,35 @@ def query_set_list_spreads(tx, spreads_dict_item, spreads_dict_values, pokemon_n
                 SET r.{tier} = link_value[0]
             """
     tx.run(query)
+
+
+def query_get_stats_on_tier(tx, tier): 
+    """
+    Get the stats of a tier
+    @param tx: transaction
+    @param tier: name of the tier
+    """
+    query = f"""match (t:Tier)-[r:IN_TIER]-(p:Pokemon) where t.name="{tier}" return sum(p.st_hp), sum(p.st_atk), sum(p.st_def), sum(p.st_spa), sum(p.st_spd), sum(p.st_spe), count(p), count(r.value)"""
+    results =  tx.run(query)
+
+def query_get_types_usage(tx,tier):
+    """
+    Get the types usage of a tier
+    @param tx: transaction
+    @param tier: name of the tier
+    """
+    query = f"""match (ty:Type)-[]-(p:Pokemon), (p)-[r:IN_TIER]-(ti:Tier) where ti.name="{tier}" return ty.name, sum(r.value) as nb_pkm order by nb_pkm desc"""
+    results =  tx.run(query)
+    return results
+
+def query_get_average_stats(tx, tier):
+    """
+    Get the average stats of a tier
+    @param tx: transaction
+    @param tier: name of the tier
+    """
+    query = f"""match (p:Pokemon)-[r:IN_TIER]-(ti:Tier) where ti.name="{tier}" return sum(p.st_hp*r.value)/sum(r.value) as av_hp, sum(p.st_atk*r.value)/sum(r.value) as av_atk,  sum(p.st_def*r.value)/sum(r.value) as av_def,
+            sum(p.st_spa*r.value)/sum(r.value) as av_spa, sum(p.st_spd*r.value)/sum(r.value) as av_spd, sum(p.st_spe*r.value)/sum(r.value) as av_spe, sum(r.value) as nb_pkm
+            """
+    results = tx.run(query)
+    return results

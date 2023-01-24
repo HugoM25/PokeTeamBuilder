@@ -53,4 +53,10 @@ export class PokeInfosServiceService {
     const req = this.http.post<string>('http://127.0.0.1:5000/get_team_showdown_format', body);
     return req; 
   }
+
+  getStatsTier(tier:string):Observable<any> {
+    const body = { tier : tier };
+    const req = this.http.post<any>('http://127.0.0.1:5000/get_stats_tier', body);
+    return req; 
+  }
 }

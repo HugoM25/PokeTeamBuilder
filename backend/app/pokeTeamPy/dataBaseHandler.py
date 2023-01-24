@@ -196,7 +196,7 @@ class DataBaseHandler:
                     clean_pkm_key = remove_non_letters(pkm_key.lower())
 
                     #Link to tier
-                    dbu.query_link_to_tier(tx,clean_pkm_key, tier_name)
+                    dbu.query_link_to_tier(tx,clean_pkm_key, tier_name, tier_data[pkm_key]["Raw count"])
 
                     #Add tier infos on pokemon mates                  
                     list_mates_clean = [clean_names(mate_key) for mate_key in tier_data[pkm_key]["Teammates"].keys()]
@@ -286,7 +286,7 @@ class DataBaseHandler:
         '''
         tiers = []
         with self.driver.session(database="pokedb") as session :
-            tiers_response = session.run("MATCH (t:Tier) RETURN t.name ORDER BY t.name")
+            tiers_response = session.run("MATCH (t:Tier)-[]-(p:Pokemon) RETURN DISTINCT t.name ORDER BY t.name")
             for tier in tiers_response:
                 tiers.append(str(tier[0]))
         return tiers
@@ -362,7 +362,44 @@ class DataBaseHandler:
                 """
             )
             return list(result.value('nextBestMates'))
-    
+
+    def get_stats_tier(self, tier): 
+
+        query1 = f"""match (p:Pokemon)-[r:IN_TIER]-(ti:Tier) where ti.name="{tier}" return sum(p.st_hp*r.value)/sum(r.value) as av_hp, sum(p.st_atk*r.value)/sum(r.value) as av_atk,  sum(p.st_def*r.value)/sum(r.value) as av_def,
+            sum(p.st_spa*r.value)/sum(r.value) as av_spa, sum(p.st_spd*r.value)/sum(r.value) as av_spd, sum(p.st_spe*r.value)/sum(r.value) as av_spe
+            """
+        
+        query2 = f"""match (ty:Type)-[]-(p:Pokemon), (p)-[r:IN_TIER]-(ti:Tier) where ti.name="{tier}" return ty.name, ty.color, sum(r.value) as nb_pkm order by nb_pkm desc"""
+
+        with self.driver.session(database="pokedb") as session :
+            #Get the average stats of the tier
+            result = session.run(
+                query1
+            )
+            av_stats = result.single()   
+            av_stats = dict(av_stats)       
+
+            #Get the type repartition in the tier
+            result = session.run(
+                query2
+            )
+            list_values = result.values()
+
+            type_repartition = {}
+
+            for value in list_values :
+                type_repartition[value[0]] = {
+                    'color' : value[1],
+                    'nb_pkm' : value[2]
+                }
+            
+
+            final_stats = {
+                'average_stats' : av_stats,
+                'type_repartition' : type_repartition
+            }
+            return final_stats
+
 def get_pokemon_names_in_format(format_name: str) -> list:
     """
     Returns a list of all pokemon names in a given format
